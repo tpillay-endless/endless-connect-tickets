@@ -1,6 +1,6 @@
-// Minimal OpenNext config for Cloudflare — non-empty default export.
-const config = {
-  version: 1, // any key so it's not empty
-};
+// open-next.config.ts (v2)
+import { defineCloudflareConfig } from "@opennextjs/cloudflare";
 
-export default config;
+export default defineCloudflareConfig({
+  // minimal, empty options are fine
+});
