@@ -3,8 +3,10 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "prebuild": "node -e \"try{require('fs').unlinkSync('next.config.ts');console.log('Removed next.config.ts')}catch(e){}\"",
+    "build": "next build",
     "dev": "next dev -p 3000",
-    "build": "next build"
+    "start": "next start -p 3000"
   },
   "dependencies": {
     "next": "^14.2.5",
