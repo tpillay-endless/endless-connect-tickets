@@ -1,5 +1,4 @@
-// Minimal OpenNext config for Cloudflare (CommonJS).
-// Non-empty default export so the builder doesn't prompt.
+// CommonJS fallback so the loader can always read it.
 module.exports = {
   version: 1
 };
