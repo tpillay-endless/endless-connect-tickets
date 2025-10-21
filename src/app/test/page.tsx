@@ -9,10 +9,14 @@ export default function Test() {
 
   const fmt = (n: number | null) => (n == null ? '—' : new Intl.NumberFormat().format(n));
 
+  type Inventory = { total: number; sold: number; left: number };
+  type RegisterResp = { ok: true; total: number; sold: number; left: number };
+
   async function getInventory() {
     setStatus('loading inventory…');
     const res = await fetch('/tickets/api/inventory', { cache: 'no-store' });
-    const data = await res.json();
+    if (!res.ok) throw new Error('inventory failed');
+    const data = (await res.json()) as Inventory;
     setTotal(data.total); setSold(data.sold); setLeft(data.left);
     setStatus('ok');
   }
@@ -20,7 +24,8 @@ export default function Test() {
   async function registerOnce() {
     setStatus('registering…');
     const res = await fetch('/tickets/api/register', { method: 'POST' });
-    const data = await res.json();
+    if (!res.ok) throw new Error('register failed');
+    const data = (await res.json()) as RegisterResp;
     setTotal(data.total); setSold(data.sold); setLeft(data.left);
     setStatus('ok');
   }
