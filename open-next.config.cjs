@@ -1,4 +1,7 @@
-// CommonJS fallback so the loader can always read it.
+// Minimal OpenNext config for Cloudflare.
+// The loader expects an object with a `default` property.
 module.exports = {
-  version: 1
+  default: {
+    // keep empty defaults; presence of `default` unblocks the build
+  }
 };
