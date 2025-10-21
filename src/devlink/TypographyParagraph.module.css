@@ -1,0 +1,55 @@
+.c-paragraph {
+  font-family: var(--_text-style---font-family);
+  font-size: var(--_text-style---font-size);
+  line-height: var(--_text-style---line-height);
+  font-weight: var(--_text-style---font-weight);
+  letter-spacing: var(--_text-style---letter-spacing);
+  text-transform: var(--_text-style---text-transform, none);
+
+  text-wrap: var(--_text-style---text-wrap);
+}
+
+.c-paragraph:where(.w-variant-eee56f15-d7ce-d101-2f8c-83b3bbd55d4a) {
+  ---mode--collection-b7222b48-79c4-934f-5073-fc41f016b656: mode-7b9e3726-80fe-711d-b3bd-df6bd6afd393;
+}
+
+.c-paragraph:where(.w-variant-3ddfa43e-abc1-422e-6e6d-23dfb7da71f3) {
+  ---mode--collection-b7222b48-79c4-934f-5073-fc41f016b656: mode-e50a1a4e-8a8e-3fbf-3c6d-105e8e8aba20;
+}
+
+.c-paragraph:where(.w-variant-efb733fe-da83-69a3-ea4a-b3f2f89d0389) {
+  ---mode--collection-b7222b48-79c4-934f-5073-fc41f016b656: mode-9194f0c6-c7b1-703e-a84c-14dafbdf93ff;
+}
+
+.c-paragraph:where(.w-variant-ad482112-9d0e-852c-0f6e-ba1e5a3aee59) {
+  ---mode--collection-b7222b48-79c4-934f-5073-fc41f016b656: mode-c897067e-2dfb-40ff-c79f-ddfdd73c7273;
+}
+
+.c-paragraph:where(.w-variant-93e8af18-8413-e3ac-0442-72629401a3db) {
+  ---mode--collection-b7222b48-79c4-934f-5073-fc41f016b656: mode-f573562d-abfe-a445-157e-2ff8aa9b7d73;
+}
+
+.c-paragraph:where(.w-variant-5c484503-e2a0-ac99-680d-56013d859efa) {
+  ---mode--collection-b7222b48-79c4-934f-5073-fc41f016b656: mode-e99d08ea-e066-5ff1-9ff6-ced2c9062682;
+}
+
+.c-paragraph:where(.w-variant-b8555f10-fa7d-e9ba-e262-f9aa44c27c1c) {
+  ---mode--collection-b7222b48-79c4-934f-5073-fc41f016b656: mode-c9345ae7-c304-bdf4-0e41-d2ecd312c02f;
+}
+
+.c-paragraph:where(.w-variant-fdb8e663-01e0-aae6-13eb-e6dfca16b689) {
+  ---mode--collection-b7222b48-79c4-934f-5073-fc41f016b656: mode-5208c5a5-0de0-01a0-a3b6-bcbe489ecc38;
+}
+
+.c-paragraph:where(.w-variant-61d538b2-709c-eb7a-4258-8c0890dc07fc) {
+  ---mode--collection-b7222b48-79c4-934f-5073-fc41f016b656: base;
+}
+
+.c-paragraph:where(.w-variant-4099173f-f581-635c-a5fe-cf4a89c62029) {
+  ---mode--collection-b7222b48-79c4-934f-5073-fc41f016b656: mode-55e5b3f5-27ac-b6ac-eb78-2facc18d7040;
+}
+
+.c-paragraph:where(.w-variant-934db1aa-3bd5-1086-088e-28381a543835) {
+  font-size: var(--_typography---font-size--text-tiny);
+  letter-spacing: var(--_typography---letter-spacing--wide);
+}

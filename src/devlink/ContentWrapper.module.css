@@ -1,0 +1,19 @@
+.u-content-wrapper {
+  text-align: var(--_alignment---direction, start);
+}
+
+.u-content-wrapper:where(.w-variant-67e1f4a6-997b-b215-d348-cc757a57083b) {
+  ---mode--collection-e6b36abd-110e-53c3-7d7c-db25eac1e019: base;
+}
+
+.u-content-wrapper:where(.w-variant-4f54624e-ceb1-0769-a238-365d5e220b70) {
+  ---mode--collection-e6b36abd-110e-53c3-7d7c-db25eac1e019: mode-bff72b6a-646d-c2ee-b0ac-6678445d9fc8;
+}
+
+.u-content-wrapper:where(.w-variant-405b6754-709a-81de-bf32-f0102c0c7aa2) {
+  ---mode--collection-e6b36abd-110e-53c3-7d7c-db25eac1e019: mode-b618cff7-fcf0-7d48-1b4f-a55bd36c954b;
+}
+
+.u-display-contents {
+  display: contents;
+}

@@ -1,0 +1,50 @@
+.c-heading {
+  font-family: var(--_text-style---font-family);
+  font-size: var(--_text-style---font-size);
+  line-height: var(--_text-style---line-height);
+  font-weight: var(--_text-style---font-weight);
+  letter-spacing: var(--_text-style---letter-spacing);
+  text-transform: var(--_text-style---text-transform, none);
+
+  text-wrap: var(--_text-style---text-wrap);
+}
+
+.c-heading:where(.w-variant-41c609dc-9c80-9eef-75df-03bf0eea00b4) {
+  ---mode--collection-b7222b48-79c4-934f-5073-fc41f016b656: mode-7b9e3726-80fe-711d-b3bd-df6bd6afd393;
+}
+
+.c-heading:where(.w-variant-792802b6-ccdb-f982-5023-5fa970cf03d0) {
+  ---mode--collection-b7222b48-79c4-934f-5073-fc41f016b656: mode-e50a1a4e-8a8e-3fbf-3c6d-105e8e8aba20;
+}
+
+.c-heading:where(.w-variant-433d40c6-c261-f13f-c899-61d2cadf150f) {
+  ---mode--collection-b7222b48-79c4-934f-5073-fc41f016b656: mode-9194f0c6-c7b1-703e-a84c-14dafbdf93ff;
+}
+
+.c-heading:where(.w-variant-701c4b6c-37cf-de59-d80d-80a1822c4994) {
+  ---mode--collection-b7222b48-79c4-934f-5073-fc41f016b656: mode-c897067e-2dfb-40ff-c79f-ddfdd73c7273;
+}
+
+.c-heading:where(.w-variant-7c7eb163-b37d-338d-2369-5eae7e6d458a) {
+  ---mode--collection-b7222b48-79c4-934f-5073-fc41f016b656: mode-f573562d-abfe-a445-157e-2ff8aa9b7d73;
+}
+
+.c-heading:where(.w-variant-326a9562-3263-06da-e8ef-16981fd70f1c) {
+  ---mode--collection-b7222b48-79c4-934f-5073-fc41f016b656: mode-e99d08ea-e066-5ff1-9ff6-ced2c9062682;
+}
+
+.c-heading:where(.w-variant-823daff2-fd84-8da0-4ed1-92a39b869ad0) {
+  ---mode--collection-b7222b48-79c4-934f-5073-fc41f016b656: mode-c9345ae7-c304-bdf4-0e41-d2ecd312c02f;
+}
+
+.c-heading:where(.w-variant-74a3180a-e505-b452-032f-599c8e557249) {
+  ---mode--collection-b7222b48-79c4-934f-5073-fc41f016b656: mode-5208c5a5-0de0-01a0-a3b6-bcbe489ecc38;
+}
+
+.c-heading:where(.w-variant-9027c8ae-1ba5-f702-ea6e-4a1c3fca9f64) {
+  ---mode--collection-b7222b48-79c4-934f-5073-fc41f016b656: base;
+}
+
+.c-heading:where(.w-variant-3fbd0d32-5675-1947-73b3-abb16c1fb986) {
+  ---mode--collection-b7222b48-79c4-934f-5073-fc41f016b656: mode-55e5b3f5-27ac-b6ac-eb78-2facc18d7040;
+}

@@ -1,21 +1,34 @@
 {
-  "name": "endless-connect-tickets",
+  "name": "nextjs",
+  "version": "0.1.0",
   "private": true,
-  "type": "module",
   "scripts": {
-    "prebuild": "node -e \"try{require('fs').unlinkSync('next.config.ts');console.log('Removed next.config.ts')}catch(e){}\"",
+    "dev": "next dev",
     "build": "next build",
-    "dev": "next dev -p 3000",
-    "start": "next start -p 3000"
+    "start": "next start",
+    "lint": "next lint",
+    "deploy": "webflow cloud deploy",
+    "preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
+    "cf-typegen": "wrangler types --env-interface CloudflareEnv cloudflare-env.d.ts"
   },
   "dependencies": {
-    "next": "^14.2.5",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1",
-    "@opennextjs/cloudflare": "latest"
+    "next": "15.2.5",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
   },
   "devDependencies": {
-    "typescript": "^5.4.0",
-    "wrangler": "latest"
+    "@cloudflare/workers-types": "^4.20250415.0",
+    "@eslint/eslintrc": "^3",
+    "@opennextjs/cloudflare": "^1.6.5",
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "15.2.5",
+    "postcss-import": "^16.1.0",
+    "tailwindcss": "^4",
+    "typescript": "^5",
+    "wrangler": "^4.11.1"
   }
 }

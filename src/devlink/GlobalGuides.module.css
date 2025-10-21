@@ -1,0 +1,100 @@
+.guide_wrap {
+  position: fixed;
+  left: 0%;
+  top: 0%;
+  right: 0%;
+  bottom: auto;
+  z-index: 2000;
+
+  display: none;
+  overflow: hidden;
+
+  pointer-events: none;
+}
+
+.u-container {
+  z-index: 1;
+
+  max-width: var(--max-width--main);
+  margin-right: auto;
+  margin-left: auto;
+  flex-grow: 1;
+  flex-shrink: 1;
+  flex-basis: 0%;
+
+  container-type: inline-size;
+  container-name: threshold-large;
+
+  width: calc(100% - var(--site--margin));
+}
+
+.guide_layout {
+  display: grid;
+  grid-auto-columns: 1fr;
+  grid-column-gap: var(--site--gutter);
+  grid-row-gap: var(--site--gutter);
+  grid-template-rows: auto;
+  grid-template-columns: repeat(var(--site--column-count), minmax(0, 1fr));
+}
+
+.guide_column {
+  display: flex;
+  height: 100vh;
+  padding-top: 0.6rem;
+  padding-bottom: 0.6rem;
+  flex-direction: column;
+  justify-content: flex-end;
+  flex-wrap: nowrap;
+  align-items: center;
+
+  background-color: hsla(176, 0.00%, 57.33%, 0.06);
+
+  color: hsla(175.95238095238096, 0.00%, 54.00%, 0.50);
+}
+
+#w-node-_65688088-5b56-68ad-a730-42e184519f80-c15c9297 {
+}
+#w-node-b6210f0c-4221-fa8a-5256-aa5460923f64-c15c9297 {
+}
+#w-node-_50be7bfa-c038-42eb-9dfd-b73ce02857f4-c15c9297 {
+}
+#w-node-_7580693a-50a1-f4c0-8151-d118500df83d-c15c9297 {
+}
+#w-node-_5465c23a-0499-a9d9-3259-c9c809ce8225-c15c9297 {
+}
+#w-node-f2397e23-badc-6c44-d459-d5fb06e75d25-c15c9297 {
+}
+#w-node-_40cd7308-446b-8436-3bec-08c2511e8a92-c15c9297 {
+}
+#w-node-a4d14692-05b0-3fe2-39c4-df924de9bb63-c15c9297 {
+}
+#w-node-e00b96dc-c36e-896e-0734-997b8cdc3b1f-c15c9297 {
+}
+#w-node-_0d025399-62ad-2275-6e06-d72bf6d4de31-c15c9297 {
+}
+#w-node-_7abb144c-49fd-4139-5197-2681530cd696-c15c9297 {
+}
+#w-node-_80f35e59-a2cb-6a74-ecfb-fb9848bdbcfc-c15c9297 {
+}
+#w-node-ad1f421f-fb29-26d5-2d86-c30511732ccc-c15c9297 {
+}
+#w-node-f1476cf9-9856-f597-926a-de65e81c573d-c15c9297 {
+}
+#w-node-_74e5b0be-333a-cfd4-5fe6-253a364799ea-c15c9297 {
+}
+#w-node-afe9d7c1-1a07-ce7d-6a1e-306a462cf522-c15c9297 {
+}
+#w-node-_87fd73de-0902-43ee-a007-8ea31e2f7d20-c15c9297 {
+}
+#w-node-ff9f7a2b-a960-68f3-63c4-970098e3cab2-c15c9297 {
+}
+#w-node-bc0fcdd5-7ca9-34c1-2f92-236484256e85-c15c9297 {
+}
+#w-node-_320e7347-61ce-6571-feca-0499369fa2ed-c15c9297 {
+}
+#w-node-_970a0957-78c0-1a4a-ecc9-9579e38de7d7-c15c9297 {
+}
+#w-node-_40959ce7-715e-fc35-7dc2-0d65b7ef6c64-c15c9297 {
+}
+#w-node-abc9780e-fdbf-3600-c5d0-2aa6a2689803-c15c9297 {
+}

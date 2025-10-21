@@ -1,0 +1,13 @@
+.tag_wrap {
+  display: inline-block;
+  min-width: 4rem;
+  padding: 0.5rem 0.75rem;
+
+  border-radius: var(--radius--small);
+
+  background-color: var(--_theme---text-primary);
+
+  color: var(--_theme---background);
+  line-height: var(--_typography---line-height--small);
+  text-align: center;
+}

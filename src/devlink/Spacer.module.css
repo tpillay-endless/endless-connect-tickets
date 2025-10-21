@@ -1,0 +1,24 @@
+.u-section-spacer {
+  position: relative;
+  height: var(--_spacing---section-space--none);
+}
+
+.u-section-spacer:where(.w-variant-d422cbd0-f212-c815-68df-63414354c21d) {
+  height: var(--_spacing---section-space--small);
+}
+
+.u-section-spacer:where(.w-variant-60a7ad7d-02b0-6682-95a5-2218e6fd1490) {
+  height: var(--_spacing---section-space--main);
+}
+
+.u-section-spacer:where(.w-variant-8cc18b30-4618-8767-0111-f6abfe45aaa3) {
+  height: var(--_spacing---section-space--large);
+}
+
+.u-section-spacer:where(.w-variant-41fc0c0a-cac3-53c9-9802-6a916e3fb342) {
+  height: var(--site--margin);
+}
+
+.u-section-spacer:where(.w-variant-e359d2da-de19-6775-b122-3e06f925f39e) {
+  height: var(--_spacing---section-space--page-top);
+}

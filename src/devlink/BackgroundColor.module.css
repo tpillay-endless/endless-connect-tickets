@@ -1,0 +1,7 @@
+.background_wrap:where(.w-variant-cd5f9287-5b9f-b1bf-cfe9-3449eb06f297) {
+  background-color: var(--_theme---background);
+}
+
+.background_wrap:where(.w-variant-eb0f2029-84f7-ce58-38ea-0afc3f5a3171) {
+  background-color: var(--_theme---background-2);
+}

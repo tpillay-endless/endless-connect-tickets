@@ -1,0 +1,63 @@
+.button_close_wrap {
+  position: relative;
+
+  display: inline-flex;
+  width: 3rem;
+  justify-content: center;
+  align-items: center;
+  aspect-ratio: 1/1;
+
+  border-top-style: solid;
+  border-top-width: var(--border-width--main);
+  border-right-style: solid;
+  border-right-width: var(--border-width--main);
+  border-bottom-style: solid;
+  border-bottom-width: var(--border-width--main);
+  border-left-style: solid;
+  border-left-width: var(--border-width--main);
+  border-top-left-radius: var(--radius--round);
+  border-top-right-radius: var(--radius--round);
+  border-bottom-left-radius: var(--radius--round);
+  border-bottom-right-radius: var(--radius--round);
+
+  transition-property: all;
+  transition-duration: 200ms;
+  transition-timing-function: ease;
+
+  vertical-align: middle;
+
+  ---mode--collection-8527ce3f-b0ac-c719-bfe1-e5f32af64e3f: base;
+
+  background-color: color-mix( in srgb, var(--_button-style---background) calc(100% * var(--_trigger---on)), var(--_button-style---background-hover) calc(100% * var(--_trigger---off))
+  );
+
+  color: color-mix( in srgb, var(--_button-style---text) calc(100% * var(--_trigger---on)), var(--_button-style---text-hover) calc(100% * var(--_trigger---off))
+  );
+
+  border-top-color: color-mix( in srgb, var(--_button-style---border) calc(100% * var(--_trigger---on)), var(--_button-style---border-hover) calc(100% * var(--_trigger---off))
+  );
+  border-right-color: color-mix( in srgb, var(--_button-style---border) calc(100% * var(--_trigger---on)), var(--_button-style---border-hover) calc(100% * var(--_trigger---off))
+  );
+  border-bottom-color: color-mix( in srgb, var(--_button-style---border) calc(100% * var(--_trigger---on)), var(--_button-style---border-hover) calc(100% * var(--_trigger---off))
+  );
+  border-left-color: color-mix( in srgb, var(--_button-style---border) calc(100% * var(--_trigger---on)), var(--_button-style---border-hover) calc(100% * var(--_trigger---off))
+  );
+}
+
+.button_close_wrap:where(.w-variant-ab355ea0-b722-2f23-3507-f0290f710e57) {
+  ---mode--collection-8527ce3f-b0ac-c719-bfe1-e5f32af64e3f: mode-002406cf-227a-62a3-cf03-f9d5a175ec01;
+}
+
+.button_close_wrap:where(.w-variant-bb0688d1-65b6-14b6-81e5-21e2cd39bbda) {
+  ---mode--collection-8527ce3f-b0ac-c719-bfe1-e5f32af64e3f: mode-002406cf-227a-62a3-cf03-f9d5a175ec01;
+}
+
+.button_close_wrap:where(.w-variant-c144d67f-2c62-4dbf-0fd8-0b6056b717ec) {
+  ---mode--collection-8527ce3f-b0ac-c719-bfe1-e5f32af64e3f: mode-002406cf-227a-62a3-cf03-f9d5a175ec01;
+}
+
+.button_close_icon {
+  position: relative;
+  width: 36%;
+  aspect-ratio: 1/1;
+}

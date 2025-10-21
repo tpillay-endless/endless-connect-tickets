@@ -1,0 +1,55 @@
+.tab_wrap {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  grid-column-gap: 2rem;
+  grid-row-gap: 2rem;
+}
+
+.tab_button_list {
+  display: flex;
+  padding-right: var(--site--margin);
+  padding-left: var(--site--margin);
+  overflow-x: auto;
+  overflow-y: clip;
+  margin-left: calc(var(--site--margin) * -1);
+  margin-right: calc(var(--site--margin) * -1);
+}
+
+.tab_content_wrap {
+  padding-right: var(--site--margin);
+  padding-left: var(--site--margin);
+  margin-left: calc(var(--site--margin) * -1);
+  margin-right: calc(var(--site--margin) * -1);
+  overflow-x: clip;
+}
+
+.tab_content_list {
+  position: relative;
+
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  grid-column-gap: 2rem;
+  grid-row-gap: 2rem;
+}
+
+.tab_control_wrap {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  align-items: center;
+  grid-column-gap: var(--_spacing---space--2);
+  grid-row-gap: var(--_spacing---space--2);
+}
+
+.tab_arrow_wrap {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  flex-wrap: wrap;
+  align-items: center;
+  grid-column-gap: var(--_spacing---space--2);
+  grid-row-gap: var(--_spacing---space--2);
+}

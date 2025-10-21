@@ -1,0 +1,38 @@
+.card_speaker_wrap {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  grid-column-gap: var(--_spacing---space--3);
+  grid-row-gap: var(--_spacing---space--3);
+
+  color: var(--_theme---text-primary);
+}
+
+.card_speaker_name-block.u-flex-vertical-nowrap {
+  grid-column-gap: var(--_spacing---space--2);
+  grid-row-gap: var(--_spacing---space--2);
+}
+
+.u-flex-vertical-nowrap {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  flex-wrap: nowrap;
+  align-items: var(--_alignment---direction, start);
+
+  text-align: var(--_alignment---direction, start);
+}
+
+.u-margin-bottom-3 {
+  margin-bottom: var(--_spacing---space--3);
+}
+
+.card_speaker_name {
+  color: var(--_theme---text-secondary);
+}
+
+.u-max-width-35ch {
+  max-width: 35ch;
+}

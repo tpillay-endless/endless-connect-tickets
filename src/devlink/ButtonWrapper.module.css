@@ -1,0 +1,15 @@
+.u-button-group {
+  display: flex;
+  margin-top: var(--_spacing---space--6);
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  align-content: center;
+  grid-column-gap: var(--_spacing---space--2);
+  grid-row-gap: var(--_spacing---space--2);
+  justify-content: var(--_alignment---direction, start);
+}
+
+.u-display-contents {
+  display: contents;
+}

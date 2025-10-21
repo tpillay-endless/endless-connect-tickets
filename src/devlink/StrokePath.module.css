@@ -1,0 +1,5 @@
+.u-path {
+  stroke-width: var(--border-width--main);
+  stroke: currentColor;
+  vector-effect: non-scaling-stroke;
+}

@@ -1,0 +1,60 @@
+.u-section {
+  position: relative;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  flex-wrap: nowrap;
+  align-items: stretch;
+
+  background-color: var(--_theme---background);
+
+  color: var(--_theme---text-primary);
+}
+
+.u-section:where(.w-variant-a4eabb01-8ed6-63d0-157e-0a7b56aedaa1) {
+  ---mode--collection-f25616ad-251e-9565-fa56-447a0d6e7548: base;
+}
+
+.u-section:where(.w-variant-857e5430-97c7-deb6-3c1a-d3063f9fe2c7) {
+  ---mode--collection-f25616ad-251e-9565-fa56-447a0d6e7548: mode-56ba09a5-7276-98be-9408-cf10e5c05255;
+}
+
+.u-section:where(.w-variant-f3a81397-d460-3add-9beb-5ec7af47907a) {
+  ---mode--collection-f25616ad-251e-9565-fa56-447a0d6e7548: base;
+}
+
+.u-section:where(.w-variant-b4d321b1-05d4-6b05-8ab2-dfbc2f41ee4e) {
+  ---mode--collection-f25616ad-251e-9565-fa56-447a0d6e7548: mode-56ba09a5-7276-98be-9408-cf10e5c05255;
+}
+
+.u-section:where(.w-variant-25bf08d9-3196-322b-5616-019ac7f0f4f7) {
+  ---mode--collection-f25616ad-251e-9565-fa56-447a0d6e7548: mode-f385917d-c945-79cc-0de1-372bf8602d9d;
+}
+
+.u-cover-absolute {
+  position: absolute;
+  left: 0%;
+  top: 0%;
+  right: 0%;
+  bottom: 0%;
+
+  width: 100%;
+  height: 100%;
+}
+
+.u-container {
+  z-index: 1;
+
+  max-width: var(--max-width--main);
+  margin-right: auto;
+  margin-left: auto;
+  flex-grow: 1;
+  flex-shrink: 1;
+  flex-basis: 0%;
+
+  container-type: inline-size;
+  container-name: threshold-large;
+
+  width: calc(100% - var(--site--margin));
+}
