@@ -1,11 +1,33 @@
-// One shared in-memory store that survives Next dev HMR.
-// Change total to your real cap.
-type Store = { total: number; sold: number };
+// src/lib/ticketStore.ts
+export type Store = { total: number; sold: number };
 
-const g = globalThis as unknown as { __TICKET_STORE?: Store };
+const API = {
+  url: process.env.UPSTASH_REDIS_REST_URL,
+  token: process.env.UPSTASH_REDIS_REST_TOKEN,
+};
 
-if (!g.__TICKET_STORE) {
-  g.__TICKET_STORE = { total: 110, sold: 0 }; // <-- set your starting numbers here
+export async function getStore(): Promise<Store> {
+  if (!API.url || !API.token)
+    return { total: 110, sold: 0 }; // fallback to memory
+  try {
+    const r = await fetch(`${API.url}/get/tickets`, {
+      headers: { Authorization: `Bearer ${API.token}` },
+    });
+    const data = await r.json();
+    return data.result ? JSON.parse(data.result) : { total: 110, sold: 0 };
+  } catch {
+    return { total: 110, sold: 0 };
+  }
 }
 
-export const store = g.__TICKET_STORE!;
+export async function setStore(data: Store) {
+  if (!API.url || !API.token) return;
+  await fetch(`${API.url}/set/tickets`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${API.token}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(JSON.stringify(data)),
+  });
+}
