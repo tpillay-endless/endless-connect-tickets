@@ -1,18 +1,16 @@
 // src/lib/ticketStore.ts
 export type Store = { total: number; sold: number };
 
-const DEFAULT: Store = { total: 110, sold: 0 }; // fallback if Upstash/env not present
+const DEFAULT: Store = { total: 110, sold: 0 };
 
 const API = {
   url: process.env.UPSTASH_REDIS_REST_URL,
   token: process.env.UPSTASH_REDIS_REST_TOKEN,
 };
 
-// Upstash GET /get/<key> returns: { result: string | null }
 type UpstashGetResponse = { result: string | null };
 
 export async function getStore(): Promise<Store> {
-  // No env → fallback to in-memory defaults
   if (!API.url || !API.token) return DEFAULT;
 
   try {
@@ -25,8 +23,11 @@ export async function getStore(): Promise<Store> {
     const data = (await r.json()) as UpstashGetResponse;
     if (!data || data.result == null) return DEFAULT;
 
-    // The value we stored is a JSON string (e.g. '{"total":110,"sold":50}')
-    return JSON.parse(data.result) as Store;
+    const obj = JSON.parse(data.result) as Partial<Store>;
+    // coerce to numbers in case the stored JSON has strings
+    const total = Number(obj.total ?? DEFAULT.total);
+    const sold  = Number(obj.sold  ?? DEFAULT.sold);
+    return { total, sold };
   } catch {
     return DEFAULT;
   }
@@ -34,15 +35,12 @@ export async function getStore(): Promise<Store> {
 
 export async function setStore(data: Store) {
   if (!API.url || !API.token) return;
-
-  // Upstash /set expects the raw value in the body; we store a JSON string.
-  // Example: body = '"{\"total\":110,\"sold\":51}"'
   await fetch(`${API.url}/set/tickets`, {
     method: 'POST',
     headers: {
       Authorization: `Bearer ${API.token}`,
-      'Content-Type': 'application/json',
+      'Content-Type': 'text/plain',           // <- text is safest
     },
-    body: JSON.stringify(JSON.stringify(data)),
+    body: JSON.stringify(data),               // <- ONLY ONE stringify
   });
 }
