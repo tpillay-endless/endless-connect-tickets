@@ -9,10 +9,15 @@
     "lint": "next lint",
     "deploy": "webflow cloud deploy",
     "preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
-    "cf-typegen": "wrangler types --env-interface CloudflareEnv cloudflare-env.d.ts"
+    "cf-typegen": "wrangler types --env-interface CloudflareEnv cloudflare-env.d.ts",
+    "import-attendees": "tsx scripts/import-attendees.ts"
   },
   "dependencies": {
+    "dotenv": "^17.2.3",
+    "libphonenumber-js": "^1.12.25",
     "next": "15.2.5",
+    "node-fetch": "^3.3.2",
+    "papaparse": "^5.5.3",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
   },
@@ -28,7 +33,8 @@
     "eslint-config-next": "15.2.5",
     "postcss-import": "^16.1.0",
     "tailwindcss": "^4",
-    "typescript": "^5",
+    "tsx": "^4.20.6",
+    "typescript": "^5.9.3",
     "wrangler": "^4.11.1"
   }
 }
