@@ -1,0 +1,511 @@
+.page {
+  max-width: 60rem;
+  margin: 0 auto;
+  padding: var(--_spacing---space--5);
+  display: grid;
+  gap: var(--_spacing---space--6);
+}
+
+.spinPage {
+  position: relative;
+  min-height: 100svh;
+  height: 100svh;
+  padding: var(--_spacing---space--6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--_theme---background);
+  overflow: hidden;
+}
+
+.spinLogo {
+  position: absolute;
+  top: var(--_spacing---space--5);
+  left: 50%;
+  transform: translateX(-50%);
+  display: inline-flex;
+  justify-content: center;
+  width: auto;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.spinLogoSvg {
+  width: clamp(10rem, 16vw, 14rem);
+  height: auto;
+  color: var(--_theme---text-secondary);
+}
+
+.spinViewport {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.spinStage {
+  position: relative;
+  width: min(92vw, 110rem);
+  height: clamp(72vh, calc(100svh - 14rem), 96svh);
+  display: grid;
+  place-items: center;
+}
+
+.spinEmpty {
+  max-width: 48rem;
+  text-align: center;
+  color: var(--_theme---text-secondary);
+}
+
+.spinRunDock {
+  position: fixed;
+  bottom: var(--_spacing---space--5);
+  right: var(--_spacing---space--5);
+  display: flex;
+  gap: var(--_spacing---space--2);
+  justify-content: flex-end;
+  align-items: center;
+  z-index: 25;
+}
+
+.header {
+  display: grid;
+  gap: var(--_spacing---space--6);
+}
+
+.headerTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--_spacing---space--4);
+  padding-bottom: var(--_spacing---space--4);
+}
+
+.logo {
+  display: inline-flex;
+  color: var(--_theme---text-secondary);
+}
+
+.logoSvg {
+  width: clamp(10rem, 20vw, 12rem);
+  height: auto;
+}
+
+.headerActions {
+  display: flex;
+  align-items: center;
+  gap: var(--_spacing---space--3);
+  flex-wrap: wrap;
+}
+
+.helper {
+  color: var(--_theme---text-secondary);
+  font-size: var(--_typography---font-size--text-small);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--_spacing---space--2);
+}
+
+.helperSpinner {
+  width: 0.9rem;
+  height: 0.9rem;
+  border-radius: 50%;
+  border: 2px solid color-mix(in srgb, var(--_theme---text-secondary) 50%, transparent);
+  border-top-color: var(--_theme---text-secondary);
+  animation: helper-spin 1s linear infinite;
+}
+
+.banner {
+  padding: var(--_spacing---space--3) var(--_spacing---space--4);
+  border-radius: var(--radius--tiny);
+  border: 1px solid color-mix(in srgb, var(--_theme---border) 70%, transparent);
+  background: color-mix(in srgb, var(--_theme---background-2) 65%, transparent);
+  color: var(--_theme---text-primary);
+  font-size: var(--_typography---font-size--text-small);
+}
+
+.bannerSuccess {
+  border-color: var(--swatch--success-500, var(--swatch--brand-500));
+  color: var(--swatch--success-500, var(--swatch--brand-500));
+}
+
+.bannerError {
+  border-color: var(--swatch--error);
+  color: var(--swatch--error);
+}
+
+.setupCard {
+  gap: var(--_spacing---space--6);
+}
+
+.setupFields {
+  display: grid;
+  gap: var(--_spacing---space--6);
+  grid-template-columns: repeat(auto-fit, minmax(21rem, 1fr));
+  align-items: start;
+}
+
+.label {
+  font-size: var(--_typography---font-size--text-tiny);
+  text-transform: uppercase;
+  letter-spacing: var(--_typography---letter-spacing--wide);
+  color: var(--_theme---text-secondary);
+}
+
+.countGroup,
+.companyGroup {
+  display: grid;
+  gap: var(--_spacing---space--3);
+}
+
+.countControls {
+  display: flex;
+  align-items: center;
+  gap: var(--_spacing---space--2);
+  flex-wrap: nowrap;
+}
+
+.controlField {
+  padding: 0.55rem 0.75rem;
+  border-radius: var(--radius--tiny);
+  border: 1px solid color-mix(in srgb, var(--_theme---border) 70%, transparent);
+  background: var(--_theme---background);
+  color: var(--_theme---text-primary);
+  font: inherit;
+  line-height: 1;
+  min-height: 2.6rem;
+}
+
+.controlField:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--_theme---text-secondary) 35%, transparent);
+  outline-offset: 1px;
+}
+
+.countInput {
+  width: 4.5rem;
+  text-align: center;
+  padding-inline: 0.5rem;
+}
+
+.countInput::-webkit-outer-spin-button,
+.countInput::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.countInput[type='number'] {
+  -moz-appearance: textfield;
+}
+
+.stepperButton {
+  padding: 0.55rem 0.8rem;
+  border-radius: var(--radius--tiny);
+  border: 1px solid color-mix(in srgb, var(--_theme---border) 60%, transparent);
+  background: color-mix(in srgb, var(--_theme---background-2) 70%, transparent);
+  color: var(--_theme---text-primary);
+  font: inherit;
+  cursor: pointer;
+  line-height: 1;
+  min-width: 3.25rem;
+  min-height: 2.6rem;
+}
+
+.stepperButton:hover,
+.stepperButton:focus-visible {
+  border-color: var(--swatch--brand-500);
+  color: var(--swatch--brand-500);
+}
+
+.stepperButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.filterSelect {
+  min-width: 18rem;
+}
+
+.pillList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--_spacing---space--2);
+}
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.35rem 0.8rem;
+  border-radius: 9999px;
+  border: 1px solid color-mix(in srgb, var(--_theme---text-secondary) 45%, transparent);
+  background: transparent;
+  color: var(--_theme---text-secondary);
+  font-size: var(--_typography---font-size--text-tiny);
+  letter-spacing: var(--_typography---letter-spacing--wide);
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.pill:hover,
+.pill:focus-visible {
+  border-color: var(--swatch--brand-500);
+  color: var(--swatch--brand-500);
+}
+
+.pill:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.setupFooter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--_spacing---space--3);
+}
+
+.setupActions {
+  display: flex;
+  gap: var(--_spacing---space--3);
+  align-items: center;
+}
+
+.spinnerSection {
+  position: relative;
+  display: grid;
+  gap: var(--_spacing---space--6);
+}
+
+.spinnerStage {
+  display: grid;
+  gap: var(--_spacing---space--6);
+  justify-items: center;
+  text-align: center;
+}
+
+.info {
+  padding: var(--_spacing---space--4);
+  border-radius: var(--radius--main);
+  border: 1px dashed var(--_theme---border);
+  color: var(--_theme---text-secondary);
+  text-align: center;
+}
+
+.slotColumn {
+  position: relative;
+  width: min(90rem, 92vw);
+  height: 100%;
+  padding: var(--_spacing---space--5) var(--_spacing---space--4);
+  border-radius: var(--radius--main);
+  overflow: visible;
+  perspective: 1400px;
+  transform-style: preserve-3d;
+  margin: 0 auto;
+  display: grid;
+  place-items: center;
+}
+
+.slotColumn::before,
+.slotColumn::after {
+  content: '';
+  position: absolute;
+  left: -15%;
+  right: -15%;
+  height: 30%;
+  pointer-events: none;
+  z-index: 1;
+  background: linear-gradient(180deg, var(--_theme---background) 0%, transparent 100%);
+}
+
+.slotColumn::before {
+  top: -8%;
+}
+
+.slotColumn::after {
+  bottom: -8%;
+  transform: rotate(180deg);
+}
+
+.slotColumn > * {
+  position: relative;
+  z-index: 2;
+}
+
+.slotBlurred {
+  filter: blur(8px);
+  opacity: 0.35;
+  pointer-events: none;
+  transform: scale(1);
+  transition: filter 2000ms ease, opacity 2000ms ease, transform 1200ms ease;
+}
+
+.slotBlurredFinal {
+  filter: blur(14px);
+  opacity: 0.18;
+  transform: scale(0.9);
+}
+
+.slotItem {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  display: grid;
+  place-items: center;
+  min-height: 3rem;
+  transition: transform 140ms ease, opacity 140ms ease;
+  will-change: transform, opacity;
+  transform-origin: center;
+  transform-style: preserve-3d;
+}
+
+.slotText {
+  white-space: nowrap;
+  max-width: 100%;
+  text-align: center;
+}
+
+.slotText h1,
+.slotText h2,
+.slotText h3 {
+  font-size: min(6rem, calc(5.5vh + 3.5vw));
+  line-height: 1.05;
+  overflow: visible;
+}
+
+.slotItemActive {
+  color: var(--_theme---text-primary);
+  text-shadow: 0 18px 28px rgba(0, 0, 0, 0.35);
+}
+
+.winnerColumn {
+  display: grid;
+  gap: var(--_spacing---space--6);
+  justify-items: center;
+  text-align: center;
+}
+
+.winnerList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--_spacing---space--5);
+  width: min(100%, 32rem);
+}
+
+.winnerItem {
+  display: grid;
+  gap: var(--_spacing---space--2);
+}
+
+.winnerOverlay {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -45%) scale(0.94);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--_spacing---space--6);
+  text-align: center;
+  width: min(42rem, calc(100vw - 4rem));
+  padding: var(--_spacing---space--7) var(--_spacing---space--5);
+  opacity: 0;
+  filter: drop-shadow(0 18px 40px rgba(0, 0, 0, 0.3));
+  animation: rewards-overlay-in 800ms cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
+}
+
+.winnerOverlayList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--_spacing---space--5);
+  align-items: center;
+}
+
+.winnerOverlayItem {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+
+
+.winnerName {
+  color: var(--swatch--success-500, var(--swatch--brand-500));
+  font-size: clamp(2.8rem, 5.2vh, 5rem);
+  line-height: 1.05;
+  white-space: nowrap;
+}
+
+.runDock {
+  position: fixed;
+  bottom: var(--_spacing---space--5);
+  right: var(--_spacing---space--5);
+  display: grid;
+  gap: var(--_spacing---space--3);
+  justify-items: end;
+  z-index: 25;
+}
+
+@media (max-width: 720px) {
+  .setupFields {
+    grid-template-columns: 1fr;
+  }
+
+  .selectField {
+    min-width: 100%;
+  }
+
+  .runDock {
+    left: 0;
+    right: 0;
+    padding-inline: var(--_spacing---space--4);
+    justify-items: stretch;
+  }
+
+  .spinRunDock {
+    left: 0;
+    right: 0;
+    padding-inline: var(--_spacing---space--4);
+    justify-content: center;
+    gap: var(--_spacing---space--3);
+  }
+
+  .spinStage {
+    width: 100%;
+    height: calc(100svh - 10rem);
+  }
+
+  .winnerOverlay {
+    width: min(36rem, calc(100vw - 3rem));
+    padding: var(--_spacing---space--5) var(--_spacing---space--4);
+  }
+}
+
+@keyframes rewards-overlay-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -35%) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+@keyframes helper-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}

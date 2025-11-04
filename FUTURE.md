@@ -37,6 +37,9 @@
 - Integration with **Webflow CMS** or **Endless Cloud** to sync events automatically.
 - **Endless Connect App**: internal web app for staff check-in, QR scanning, exports.
 
+## 7. Contact Info Sharing
+- Once someone scans a vCard QR they can **save the contact and share their info** with it automatically
+
 ---
 
 💡 *Add any new ideas here as they come up.*

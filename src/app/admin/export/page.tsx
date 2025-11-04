@@ -3,6 +3,14 @@
 import { useEffect, useState } from 'react';
 import styles from '@/styles/ticket-pages.module.css';
 import { EndlessLogo } from '@/components/EndlessLogo';
+import { TypographyHeading, TypographyParagraph } from '@/components/WebflowTypography';
+
+const EYEBROW_TEXT_CLASSES = 'eyebrow_text u-text-style-tiny u-text-transform-uppercase u-weight-medium';
+
+function formatStatusLabel(value: string) {
+  if (!value) return '';
+  return value.charAt(0).toUpperCase() + value.slice(1);
+}
 
 export default function AdminExport() {
   const [auth, setAuth] = useState<{ ok: boolean; name?: string; role?: string }>({ ok: false });
@@ -12,8 +20,13 @@ export default function AdminExport() {
     (async () => {
       try {
         const r = await fetch('/tickets/api/staff/me', { cache: 'no-store' });
-        const j = await r.json();
-        if (j.ok && j.user?.role === 'admin') setAuth({ ok: true, name: j.user.name, role: j.user.role });
+        type StaffMeResponse = {
+          ok: boolean;
+          user?: { name: string; role: string };
+          error?: string;
+        };
+        const j = (await r.json().catch(() => null)) as StaffMeResponse | null;
+        if (j?.ok && j.user?.role === 'admin') setAuth({ ok: true, name: j.user.name, role: j.user.role });
         else setErr('Admins only.');
       } catch {
         setErr('Auth check failed.');
@@ -22,37 +35,50 @@ export default function AdminExport() {
   }, []);
 
   const statusIsError = err && !auth.ok;
+  const statusVariant = statusIsError ? styles.statusError : styles.statusOk;
+  const statusMessage = formatStatusLabel(auth.ok ? 'Ready' : err || 'Checking permissions…');
 
   return (
     <main className={styles.page}>
-      <div className={styles.logo}>
-        <EndlessLogo className={styles.logoSvg} />
-      </div>
       <header className={styles.header}>
-        <h1 className="c-heading w-variant-792802b6-ccdb-f982-5023-5fa970cf03d0">Admin Export</h1>
-        <p className={`c-paragraph w-variant-4099173f-f581-635c-a5fe-cf4a89c62029 ${styles.status}`}>
-          <span className={styles.statusLabel}>Status:</span>{' '}
-          <span
-            className={`${styles.statusValue} ${statusIsError ? styles.statusError : styles.statusOk}`}
-          >
-            {auth.ok ? 'Ready' : err || 'Checking permissions…'}
-          </span>
-          <span aria-hidden="true" className={styles.statusDot} />
-        </p>
+        <div className={styles.headerTop}>
+          <div className={styles.logo}>
+            <EndlessLogo className={styles.logoSvg} />
+          </div>
+          <div className={`${styles.status} ${styles.headerStatus}`} role="status" aria-live="polite">
+            <span className={`${styles.statusText} ${styles.statusLabel} ${EYEBROW_TEXT_CLASSES}`}>
+              Status
+            </span>
+            <span aria-hidden="true" className={`${styles.statusDot} ${statusVariant}`} />
+            <span
+              className={`${styles.statusText} ${styles.statusValue} ${EYEBROW_TEXT_CLASSES} ${statusVariant}`}
+            >
+              {statusMessage}
+            </span>
+          </div>
+        </div>
+        <TypographyHeading fontStyle="H1" text="Admin Export" />
       </header>
 
       {!auth.ok ? (
         <section className={styles.formCard}>
-          <p className={`c-paragraph w-variant-4099173f-f581-635c-a5fe-cf4a89c62029 ${styles.feedback} ${styles.feedbackError}`}>
-            {err || 'Checking permissions…'}
-          </p>
+          <TypographyParagraph
+            fontStyle="Text Small"
+            classes={`${styles.feedback} ${styles.feedbackError}`}
+            text={err || 'Checking permissions…'}
+          />
         </section>
       ) : (
         <section className={styles.formCard}>
           <div className={styles.cardHeader}>
-            <div className="c-paragraph w-variant-61d538b2-709c-eb7a-4258-8c0890dc07fc">
-              Logged in as <strong>{auth.name}</strong> (admin)
-            </div>
+            <TypographyParagraph
+              fontStyle="Text Main"
+              text={
+                <>
+                  Logged in as <strong>{auth.name}</strong> (admin)
+                </>
+              }
+            />
           </div>
           <div className={styles.cardActions}>
             <a href="/tickets/api/admin/export" className={`${styles.submit} ${styles.buttonFullWidth}`}>

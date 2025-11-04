@@ -1,12 +1,14 @@
 import { getStore, setStore } from '@/lib/ticketStore';
-import { putTicket, type TicketRecord } from '@/lib/ticketsDb';
+import { putTicket, type TicketRecord, addTicketToIndex } from '@/lib/ticketsDb';
 import { buildAllQR } from '@/lib/qr';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
 export async function POST(req: Request) {
-  const { name, email, phone, company } = await req.json().catch(() => ({} as any));
+  type RegisterBody = { name?: string; email?: string; phone?: string; company?: string };
+  const body = (await req.json().catch(() => ({}))) as RegisterBody;
+  const { name, email, phone, company } = body;
   if (!name || !email || !phone) {
     return Response.json({ ok:false, error:'Missing name, email, or phone' }, { status: 400 });
   }
@@ -26,16 +28,7 @@ export async function POST(req: Request) {
   await putTicket(token, record);
 
   // index for export
-  const API = {
-    url: process.env.UPSTASH_REDIS_REST_URL,
-    token: process.env.UPSTASH_REDIS_REST_TOKEN,
-  };
-  if (API.url && API.token) {
-    await fetch(`${API.url}/sadd/${encodeURIComponent('tickets:index')}/${encodeURIComponent(token)}`, {
-      method: 'POST',
-      headers: { Authorization: `Bearer ${API.token}` },
-    });
-  }
+  await addTicketToIndex(token);
 
   const s = await getStore();
   const updated = { ...s, sold: s.sold + 1 };

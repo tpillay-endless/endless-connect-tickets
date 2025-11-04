@@ -5,7 +5,9 @@ export const revalidate = 0;
 
 export async function POST(req: Request) {
   try {
-    const { name, password } = await req.json().catch(() => ({}));
+    type LoginBody = { name?: string; password?: string };
+    const body = (await req.json().catch(() => ({}))) as LoginBody;
+    const { name, password } = body;
     if (!name || !password) {
       return Response.json({ ok: false, error: 'Missing name or password' }, { status: 400 });
     }

@@ -2242,7 +2242,7 @@ textarea.w-select {
     --radius--round: 0vw;
     --_theme---border: var(--swatch--dark-900-o20);
     --swatch--transparent: transparent;
-    --swatch--dark-900: #000b07;
+    --swatch--dark-900: color-mix(in srgb, var(--swatch--brand-500) 20%, black 80%);
     --swatch--light-200: #dadfdd;
     --_button-style---text: var(--_theme---button-primary--text);
     --_trigger---on: 1;

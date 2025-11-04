@@ -1,19 +1,18 @@
 .page {
   max-width: 60rem;
   margin: 0 auto;
-  padding: var(--_spacing---section-space--small) var(--site--margin);
+  padding: var(--_spacing---space--5);
   display: grid;
   gap: var(--_spacing---space--6);
 }
 
 .logo {
-  display: block;
-  padding-bottom: var(--_spacing---space--4);
+  display: inline-flex;
   color: var(--_theme---text-secondary);
 }
 
 .logoSvg {
-  width: clamp(12rem, 20vw, 14rem);
+  width: clamp(10rem, 20vw, 12rem);
   height: auto;
 }
 
@@ -22,17 +21,22 @@
   gap: var(--_spacing---space--6);
 }
 
+.headerTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--_spacing---space--4);
+  padding-bottom: var(--_spacing---space--4);
+}
+
 .lead {
   color: var(--_theme---text-secondary);
 }
 
 .formCard {
   display: grid;
-  gap: var(--_spacing---space--5);
-  padding: var(--_spacing---space--6);
-  border-radius: var(--radius--main);
-  border: 1px solid var(--_theme---border);
-  background-color: var(--_theme---background);
+  gap: var(--_spacing---space--8);
 }
 
 .submit {
@@ -137,7 +141,16 @@
   color: var(--_theme---text-secondary);
   display: inline-flex;
   align-items: center;
+  flex-wrap: nowrap;
   gap: var(--_spacing---space--2);
+}
+
+.headerStatus {
+  margin-left: auto;
+}
+
+.statusText {
+  align-items: center;
 }
 
 .statusLabel {
@@ -174,18 +187,8 @@
   border-radius: 50%;
   background-color: currentColor;
   display: inline-block;
+  flex-shrink: 0;
   animation: status-blink 2s ease-in-out infinite;
-}
-
-.statusError + .statusDot {
-  background-color: var(--swatch--error-500);
-}
-
-.statusOk + .statusDot,
-.statusReady + .statusDot,
-.statusRegistering… + .statusDot,
-.statusRegistering\\2026 + .statusDot {
-  background-color: var(--swatch--success-500, var(--swatch--brand-500));
 }
 
 @keyframes status-blink {
@@ -292,7 +295,7 @@
 
 .fieldList {
   display: grid;
-  gap: var(--_spacing---space--4);
+  gap: var(--_spacing---space--6);
 }
 
 .fieldItem {
@@ -307,13 +310,6 @@
   font-family: "Owners Text", Arial, sans-serif;
   font-size: var(--_typography---font-size--text-tiny);
   color: var(--_theme---text-secondary);
-}
-
-.fieldValue {
-  font-family: var(--_typography---font--secondary-family);
-  font-size: var(--_typography---font-size--text-large);
-  line-height: var(--_typography---line-height--huge);
-  color: var(--_theme---text-primary);
 }
 
 .feedback {
@@ -337,17 +333,26 @@
   color: var(--_theme---text-secondary);
 }
 
-.spinnerIcon {
-  width: 28px;
-  height: 28px;
-  animation: spinner-rotate 1s linear infinite;
+.spinnerBar {
+  width: min(16rem, 100%);
+  height: .35rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, currentColor 15%, transparent);
+  overflow: hidden;
+  position: relative;
 }
 
-@keyframes spinner-rotate {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.spinnerBar::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: currentColor;
+  transform: translateX(-100%);
+  animation: spinner-stripe 1.8s ease-out infinite;
+}
+
+@keyframes spinner-stripe {
+  0% { transform: translateX(-100%); }
+  50% { transform: translateX(0%); }
+  100% { transform: translateX(100%); }
 }

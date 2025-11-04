@@ -4,20 +4,24 @@ import { useEffect, useMemo, useState } from 'react';
 import { use } from 'react';
 import styles from '@/styles/ticket-pages.module.css';
 import { EndlessLogo } from '@/components/EndlessLogo';
+import { TypographyHeading, TypographyParagraph, TypographyEyebrow } from '@/components/WebflowTypography';
+
+const EYEBROW_TEXT_CLASSES = 'eyebrow_text u-text-style-tiny u-text-transform-uppercase u-weight-medium';
+const STATUS_DISPLAY_OVERRIDES: Record<string, string> = {
+  ready: 'Ready',
+  ok: 'Ready',
+};
+
+function formatStatusLabel(value: string) {
+  if (!value) return '';
+  return value.charAt(0).toUpperCase() + value.slice(1);
+}
 
 function Spinner() {
   return (
     <div className={styles.spinnerWrap}>
-      <svg
-        className={styles.spinnerIcon}
-        viewBox="0 0 24 24"
-        fill="none"
-        aria-label="Loading"
-      >
-        <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" opacity="0.2" />
-        <path d="M22 12a10 10 0 0 1-10 10" stroke="currentColor" strokeWidth="2" />
-      </svg>
-      <p>Checking access…</p>
+      <div className={styles.spinnerBar} aria-hidden="true" />
+      <TypographyParagraph fontStyle="Text Small" text="Checking access…" />
     </div>
   );
 }
@@ -36,8 +40,9 @@ export default function TicketVerify({ params }: { params: Promise<{ token: stri
     setAuthLoading(true);
     try {
       const r = await fetch('/tickets/api/staff/me', { cache: 'no-store' });
-      const j = await r.json();
-      if (j.ok) setAuth({ ok: true, name: j.user.name, role: j.user.role });
+      type StaffMeResponse = { ok: boolean; user?: { name: string; role: string }; error?: string };
+      const j = (await r.json().catch(() => null)) as StaffMeResponse | null;
+      if (j?.ok && j.user) setAuth({ ok: true, name: j.user.name, role: j.user.role });
       else setAuth({ ok: false });
     } catch {
       setAuth({ ok: false });
@@ -84,8 +89,9 @@ export default function TicketVerify({ params }: { params: Promise<{ token: stri
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ name: loginName, password: loginPass }),
     });
-    const j = await r.json();
-    if (!j.ok) { setStatus(j.error || 'Invalid login'); return; }
+    type LoginResponse = { ok: boolean; error?: string };
+    const j = (await r.json().catch(() => null)) as LoginResponse | null;
+    if (!r.ok || !j?.ok) { setStatus(j?.error || 'Invalid login'); return; }
     setStatus('ok');
     setLoginPass('');
     await refreshAuth();
@@ -106,8 +112,9 @@ export default function TicketVerify({ params }: { params: Promise<{ token: stri
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ token, action }),
     });
-    const j = await r.json();
-    setStatus(j.ok ? (doingUndo ? 'Reverted' : 'Checked in') : j.error || 'Failed');
+    type VerifyResponse = { ok: boolean; status?: string; error?: string };
+    const j = (await r.json().catch(() => null)) as VerifyResponse | null;
+    setStatus(j?.ok ? (doingUndo ? 'Reverted' : 'Checked in') : j?.error || 'Failed');
     await loadTicket();
   }
 
@@ -122,13 +129,20 @@ export default function TicketVerify({ params }: { params: Promise<{ token: stri
     }
     return styles.statusOk;
   }, [status]);
+  const trimmedStatus = status.trim();
+  const statusDisplay =
+    STATUS_DISPLAY_OVERRIDES[trimmedStatus.toLowerCase()] ?? formatStatusLabel(trimmedStatus);
 
   if (authLoading) {
     return (
       <main className={styles.page}>
-        <div className={styles.logo}>
-          <EndlessLogo className={styles.logoSvg} />
-        </div>
+        <header className={styles.header}>
+          <div className={styles.headerTop}>
+            <div className={styles.logo}>
+              <EndlessLogo className={styles.logoSvg} />
+            </div>
+          </div>
+        </header>
         <Spinner />
       </main>
     );
@@ -136,22 +150,30 @@ export default function TicketVerify({ params }: { params: Promise<{ token: stri
 
   return (
     <main className={styles.page}>
-      <div className={styles.logo}>
-        <EndlessLogo className={styles.logoSvg} />
-      </div>
       <header className={styles.header}>
-        <h1 className="c-heading w-variant-792802b6-ccdb-f982-5023-5fa970cf03d0">Ticket</h1>
-        <p className={`c-paragraph w-variant-4099173f-f581-635c-a5fe-cf4a89c62029 ${styles.status}`}>
-          <span className={styles.statusLabel}>Status:</span>{' '}
-          <span className={`${styles.statusValue} ${statusVariant}`}>{status}</span>
-          <span aria-hidden="true" className={styles.statusDot} />
-        </p>
+        <div className={styles.headerTop}>
+          <div className={styles.logo}>
+            <EndlessLogo className={styles.logoSvg} />
+          </div>
+          <div className={`${styles.status} ${styles.headerStatus}`} role="status" aria-live="polite">
+            <span className={`${styles.statusText} ${styles.statusLabel} ${EYEBROW_TEXT_CLASSES}`}>
+              Status
+            </span>
+            <span aria-hidden="true" className={`${styles.statusDot} ${statusVariant}`} />
+            <span
+              className={`${styles.statusText} ${styles.statusValue} ${EYEBROW_TEXT_CLASSES} ${statusVariant}`}
+            >
+              {statusDisplay}
+            </span>
+          </div>
+        </div>
+        <TypographyHeading fontStyle="H1" text="Ticket" />
       </header>
 
       {!auth.ok ? (
         <section className={styles.formCard}>
           <div className={styles.cardHeader}>
-            <h2 className="c-heading w-variant-7c7eb163-b37d-338d-2369-5eae7e6d458a">Staff Login</h2>
+            <TypographyHeading fontStyle="H4" tag="h2" text="Staff Login" />
           </div>
           <form onSubmit={doLogin} className="form_main_layout">
             <label className="form_main_label_wrap">
@@ -191,22 +213,27 @@ export default function TicketVerify({ params }: { params: Promise<{ token: stri
               </span>
             </button>
             {status && status !== 'ready' && (
-              <p
-                className={`${styles.feedback} ${
+              <TypographyParagraph
+                fontStyle="Text Small"
+                classes={`${styles.feedback} ${
                   statusVariant === styles.statusError ? styles.feedbackError : styles.feedbackSuccess
                 }`}
-              >
-                {status}
-              </p>
+                text={status}
+              />
             )}
           </form>
         </section>
       ) : (
         <section className={styles.formCard}>
           <div className={styles.cardHeader}>
-            <div className="c-paragraph w-variant-61d538b2-709c-eb7a-4258-8c0890dc07fc">
-              Logged in as <strong>{auth.name}</strong> ({auth.role})
-            </div>
+            <TypographyParagraph
+              fontStyle="Text Tiny"
+              text={
+                <>
+                  Logged in as <strong>{auth.name}</strong> ({auth.role})
+                </>
+              }
+            />
             <button onClick={doLogout} className={`${styles.submit} ${styles.buttonSecondary} ${styles.buttonSmall}`}>
               <span className={`${styles.buttonLabel} button_main_text u-text-style-main`}>Logout</span>
             </button>
@@ -214,60 +241,39 @@ export default function TicketVerify({ params }: { params: Promise<{ token: stri
 
           <div className={styles.cardContent}>
             {!rec ? (
-              <p className="c-paragraph w-variant-4099173f-f581-635c-a5fe-cf4a89c62029">Loading ticket…</p>
+              <TypographyParagraph fontStyle="Text Small" text="Loading ticket…" />
             ) : (
               <div className={`${styles.ticketDetails} ${styles.fieldList}`}>
                 <div className={styles.fieldItem}>
-                  <span
-                    className={`${styles.fieldLabel} eyebrow_text u-text-style-tiny u-text-transform-uppercase`}
-                  >
-                    Name
-                  </span>
-                  <p className={styles.fieldValue}>{rec.name}</p>
+                  <TypographyEyebrow text="Name" classes={styles.fieldLabel} />
+                  <TypographyParagraph fontStyle="H5" text={rec.name} />
                 </div>
                 {rec.email && (
                   <div className={styles.fieldItem}>
-                    <span
-                      className={`${styles.fieldLabel} eyebrow_text u-text-style-tiny u-text-transform-uppercase`}
-                    >
-                      Email
-                    </span>
-                    <p className={styles.fieldValue}>{rec.email}</p>
+                    <TypographyEyebrow text="Email" classes={styles.fieldLabel} />
+                    <TypographyParagraph fontStyle="H5" text={rec.email} />
                   </div>
                 )}
                 {rec.phone && (
                   <div className={styles.fieldItem}>
-                    <span
-                      className={`${styles.fieldLabel} eyebrow_text u-text-style-tiny u-text-transform-uppercase`}
-                    >
-                      Phone
-                    </span>
-                    <p className={styles.fieldValue}>{rec.phone}</p>
+                    <TypographyEyebrow text="Phone" classes={styles.fieldLabel} />
+                    <TypographyParagraph fontStyle="H5" text={rec.phone} />
                   </div>
                 )}
                 {rec.company && (
                   <div className={styles.fieldItem}>
-                    <span
-                      className={`${styles.fieldLabel} eyebrow_text u-text-style-tiny u-text-transform-uppercase`}
-                    >
-                      Company
-                    </span>
-                    <p className={styles.fieldValue}>{rec.company}</p>
+                    <TypographyEyebrow text="Company" classes={styles.fieldLabel} />
+                    <TypographyParagraph fontStyle="H5" text={rec.company} />
                   </div>
                 )}
                 <div className={styles.fieldItem}>
-                  <span
-                    className={`${styles.fieldLabel} eyebrow_text u-text-style-tiny u-text-transform-uppercase`}
-                  >
-                    Status
-                  </span>
-                  <p
-                    className={`${styles.fieldValue} ${
-                      statusIsChecked ? styles.statusOk : styles.statusError
-                    }`}
-                  >
-                    {statusText}
-                  </p>
+                  <TypographyEyebrow text="Status" classes={styles.fieldLabel} />
+                  <TypographyParagraph
+                    fontStyle="H5"
+                    text={
+                      <span className={statusIsChecked ? styles.statusOk : styles.statusError}>{statusText}</span>
+                    }
+                  />
                 </div>
               </div>
             )}
