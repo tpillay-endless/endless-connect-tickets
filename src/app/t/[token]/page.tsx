@@ -1,10 +1,10 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
-import { use } from 'react';
+import { FormEvent, use, useCallback, useEffect, useMemo, useState } from 'react';
 import styles from '@/styles/ticket-pages.module.css';
 import { EndlessLogo } from '@/components/EndlessLogo';
 import { TypographyHeading, TypographyParagraph, TypographyEyebrow } from '@/components/WebflowTypography';
+import type { TicketRecord } from '@/lib/ticketsDb';
 
 const EYEBROW_TEXT_CLASSES = 'eyebrow_text u-text-style-tiny u-text-transform-uppercase u-weight-medium';
 const STATUS_DISPLAY_OVERRIDES: Record<string, string> = {
@@ -29,14 +29,14 @@ function Spinner() {
 export default function TicketVerify({ params }: { params: Promise<{ token: string }> }) {
   const { token } = use(params);
 
-  const [auth, setAuth] = useState<{ ok: boolean; name?: string; role?: string }>({ ok: false });
+  const [auth, setAuth] = useState<StaffAuthState>({ ok: false });
   const [loginName, setLoginName] = useState('');
   const [loginPass, setLoginPass] = useState('');
   const [status, setStatus] = useState<string>('ready');
-  const [ticket, setTicket] = useState<any>(null);
+  const [ticket, setTicket] = useState<VerifyResponse | null>(null);
   const [authLoading, setAuthLoading] = useState(true);
 
-  async function refreshAuth() {
+  const refreshAuth = useCallback(async () => {
     setAuthLoading(true);
     try {
       const r = await fetch('/tickets/api/staff/me', { cache: 'no-store' });
@@ -49,9 +49,9 @@ export default function TicketVerify({ params }: { params: Promise<{ token: stri
     } finally {
       setAuthLoading(false);
     }
-  }
+  }, []);
 
-  async function loadTicket() {
+  const loadTicket = useCallback(async () => {
     try {
       const r = await fetch(`/tickets/api/verify?token=${encodeURIComponent(token)}&action=status`, { cache: 'no-store' });
       if (!r.ok) {
@@ -64,24 +64,25 @@ export default function TicketVerify({ params }: { params: Promise<{ token: stri
         return;
       }
       try {
-        const j = JSON.parse(text);
-        setTicket(j);
+        const parsed = JSON.parse(text) as VerifyResponse;
+        setTicket(parsed);
       } catch {
         setTicket({ ok: false, error: 'Invalid JSON from server', raw: text });
       }
-    } catch (e: any) {
-      setTicket({ ok: false, error: e.message || 'Fetch failed' });
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : 'Fetch failed';
+      setTicket({ ok: false, error: errorMessage });
     }
-  }
+  }, [token]);
 
   useEffect(() => {
     (async () => {
       await refreshAuth();
       await loadTicket();
     })();
-  }, [token]);
+  }, [refreshAuth, loadTicket]);
 
-  async function doLogin(e: React.FormEvent) {
+  async function doLogin(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setStatus('Logging in…');
     const r = await fetch('/tickets/api/staff/login', {
@@ -103,7 +104,7 @@ export default function TicketVerify({ params }: { params: Promise<{ token: stri
   }
 
   async function toggleCheck() {
-    const doingUndo = !!(ticket && ticket.status === 'checked-in');
+    const doingUndo = ticket?.ok && ticket.status === 'checked-in';
     setStatus(doingUndo ? 'Undoing…' : 'Checking in…');
 
     const action = doingUndo ? 'undo' : 'checkin';
@@ -118,8 +119,8 @@ export default function TicketVerify({ params }: { params: Promise<{ token: stri
     await loadTicket();
   }
 
-  const rec = ticket && ticket.ok ? ticket.record : null;
-  const statusIsChecked = ticket && ticket.status === 'checked-in';
+  const rec = ticket?.ok ? ticket.record : null;
+  const statusIsChecked = ticket?.ok && ticket.status === 'checked-in';
   const statusText = statusIsChecked ? 'Checked in' : 'Not checked in';
   const statusVariant = useMemo(() => {
     const lowercase = status.toLowerCase();
@@ -300,3 +301,8 @@ export default function TicketVerify({ params }: { params: Promise<{ token: stri
     </main>
   );
 }
+type StaffAuthState = { ok: boolean; name?: string; role?: string };
+
+type VerifyResponse =
+  | { ok: true; status: string; record: TicketRecord }
+  | { ok: false; error: string; status?: string; record?: TicketRecord; raw?: string };

@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { useMemo, useState } from 'react';
 import styles from '@/styles/ticket-pages.module.css';
 import { EndlessLogo } from '@/components/EndlessLogo';
@@ -252,7 +253,13 @@ export default function ManualRegistrationPage() {
                   </div>
                   <div className={styles.assetPreview}>
                     <div className={styles.assetImage}>
-                      <img src={resp.ticketPngUrl} alt="Ticket QR" width={256} height={256} />
+                      <Image
+                        src={resp.ticketPngUrl}
+                        alt="Ticket QR"
+                        width={256}
+                        height={256}
+                        unoptimized
+                      />
                     </div>
                     <TypographyParagraph
                       fontStyle="Text Small"
@@ -272,7 +279,13 @@ export default function ManualRegistrationPage() {
                   </div>
                   <div className={styles.assetPreview}>
                     <div className={styles.assetImage}>
-                      <img src={resp.vcardSvgUrl} alt="vCard QR" width={256} height={256} />
+                      <Image
+                        src={resp.vcardSvgUrl}
+                        alt="vCard QR"
+                        width={256}
+                        height={256}
+                        unoptimized
+                      />
                     </div>
                     <TypographyParagraph
                       fontStyle="Text Small"

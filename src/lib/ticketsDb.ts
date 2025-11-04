@@ -23,7 +23,7 @@ const API = {
 
 const INDEX_KEY = 'tickets:index';
 
-async function upstashJSON<T = any>(path: string): Promise<T | null> {
+async function upstashJSON<T = unknown>(path: string): Promise<T | null> {
   if (!API.url || !API.token) return null;
   const r = await fetch(`${API.url}${path}`, {
     headers: { Authorization: `Bearer ${API.token}` },

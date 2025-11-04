@@ -15,13 +15,18 @@ async function requireAdmin(req: Request) {
   return me;
 }
 
-export async function PATCH(req: Request, { params }: { params: { token: string } }) {
+type RouteContext = { params: Promise<{ token: string }> };
+
+export async function PATCH(req: Request, context: RouteContext) {
   const session = await requireAdmin(req);
   if (!session) {
     return NextResponse.json({ ok: false, error: 'Forbidden' }, { status: 403 });
   }
 
-  const { token } = params;
+  const { token } = await context.params;
+  if (!token) {
+    return NextResponse.json({ ok: false, error: 'Missing token parameter' }, { status: 400 });
+  }
   const body = await req.json().catch(() => null);
   if (!body) {
     return NextResponse.json({ ok: false, error: 'Invalid JSON body' }, { status: 400 });
@@ -71,12 +76,15 @@ export async function PATCH(req: Request, { params }: { params: { token: string 
   return NextResponse.json({ ok: true, ticket: updated });
 }
 
-export async function DELETE(req: Request, { params }: { params: { token: string } }) {
+export async function DELETE(req: Request, context: RouteContext) {
   const session = await requireAdmin(req);
   if (!session) {
     return NextResponse.json({ ok: false, error: 'Forbidden' }, { status: 403 });
   }
-  const { token } = params;
+  const { token } = await context.params;
+  if (!token) {
+    return NextResponse.json({ ok: false, error: 'Missing token parameter' }, { status: 400 });
+  }
   await deleteTickets([token]);
   try {
     const [store, remaining] = await Promise.all([getStore(), listTickets()]);

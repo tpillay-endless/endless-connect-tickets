@@ -16,7 +16,7 @@ async function kvSetJSON(key: string, val: unknown, ttlSeconds?: number) {
     body: JSON.stringify(val),
   });
 }
-async function kvGetJSON<T = any>(key: string): Promise<T | null> {
+async function kvGetJSON<T = unknown>(key: string): Promise<T | null> {
   if (!KV.url || !KV.token) return null;
   const r = await fetch(`${KV.url}/get/${encodeURIComponent(key)}`, {
     headers: { Authorization: `Bearer ${KV.token}` },

@@ -9,6 +9,7 @@ import {
   type SVGProps,
 } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import styles from '@/styles/admin-attendees.module.css';
 import { EndlessLogo } from '@/components/EndlessLogo';
 import { TypographyHeading, TypographyParagraph } from '@/components/WebflowTypography';
@@ -634,7 +635,6 @@ export default function AdminAttendeesPage() {
                 {filteredTickets.map((ticket) => {
                   const isEditing = editing === ticket.token;
                   const isSaving = savingToken === ticket.token;
-                  const isChecking = checkingToken === ticket.token;
                   const isDeleting = deletingToken === ticket.token;
                   const draftValues = draft ?? {
                     name: '',
@@ -702,10 +702,13 @@ export default function AdminAttendeesPage() {
                         <div className={styles.qrGrid}>
                           {ticket.ticketPngUrl ? (
                             <div className={styles.qrPreview}>
-                              <img
+                              <Image
                                 src={ticket.ticketPngUrl}
                                 alt={`Ticket QR for ${ticket.name}`}
                                 className={styles.qrImage}
+                                width={72}
+                                height={72}
+                                unoptimized
                               />
                               <a href={ticket.ticketPngUrl} target="_blank" rel="noreferrer">
                                 Ticket QR
@@ -716,10 +719,13 @@ export default function AdminAttendeesPage() {
                           )}
                           {ticket.vcardSvgUrl ? (
                             <div className={styles.qrPreview}>
-                              <img
+                              <Image
                                 src={ticket.vcardSvgUrl}
                                 alt={`vCard QR for ${ticket.name}`}
                                 className={styles.qrImage}
+                                width={72}
+                                height={72}
+                                unoptimized
                               />
                               <a href={ticket.vcardSvgUrl} target="_blank" rel="noreferrer">
                                 vCard QR

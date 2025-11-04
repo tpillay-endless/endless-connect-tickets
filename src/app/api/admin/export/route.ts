@@ -22,7 +22,7 @@ const API = {
   token: process.env.UPSTASH_REDIS_REST_TOKEN!,
 };
 
-async function upstashJSON<T = any>(path: string): Promise<T | null> {
+async function upstashJSON<T = unknown>(path: string): Promise<T | null> {
   const r = await fetch(`${API.url}${path}`, {
     headers: { Authorization: `Bearer ${API.token}` },
     cache: 'no-store',
@@ -42,7 +42,7 @@ async function keys(pattern: string): Promise<string[]> {
   return res?.result ?? [];
 }
 
-async function getJSON<T = any>(key: string): Promise<T | null> {
+async function getJSON<T = unknown>(key: string): Promise<T | null> {
   const res = await upstashJSON<{ result: string | null }>(`/get/${encodeURIComponent(key)}`);
   const str = res?.result ?? null;
   if (!str) return null;
@@ -99,7 +99,7 @@ export async function GET(req: Request) {
   // Fetch tickets
   const tickets: Ticket[] = [];
   for (const token of tokens) {
-    const data = await getJSON(`ticket:${token}`);
+    const data = await getJSON<Ticket>(`ticket:${token}`);
     if (data) {
       tickets.push(data as Ticket);
     }

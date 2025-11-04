@@ -463,7 +463,6 @@ export default function RewardsPage() {
     setBanner,
     winners,
     wheelOffset,
-    eligibleAttendees,
     targetWinners,
   ]);
 
@@ -625,7 +624,7 @@ export default function RewardsPage() {
               text="Rewards awarded"
             />
             <ul className={styles.winnerOverlayList}>
-              {winners.map((winner, index) => (
+              {winners.map((winner) => (
                 <li key={winner.token} className={styles.winnerOverlayItem}>
                   <TypographyHeading
                     fontStyle="H1"
@@ -938,7 +937,7 @@ export default function RewardsPage() {
                     text="Winners"
                   />
                   <ul className={styles.winnerList}>
-                  {winners.map((winner, index) => (
+                  {winners.map((winner) => (
                     <li key={winner.token} className={styles.winnerItem}>
                       <TypographyHeading
                         fontStyle="H2"

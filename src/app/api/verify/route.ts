@@ -8,7 +8,7 @@ type Action = 'status' | 'checkin' | 'undo';
 
 type Body = { token?: string; action?: Action; key?: string };
 
-function json(data: any, status = 200) {
+function json(data: unknown, status = 200) {
   return new Response(JSON.stringify(data), {
     status,
     headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' },
