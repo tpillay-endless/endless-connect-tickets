@@ -6,7 +6,7 @@ import {
   useMemo,
   useRef,
   useState,
-  type ChangeEvent,
+  type ChangeEventHandler,
 } from 'react';
 import Link from 'next/link';
 import styles from '@/styles/admin-rewards.module.css';
@@ -259,7 +259,7 @@ export default function RewardsPage() {
     setPrizeCount((prev) => Math.max(1, prev + delta));
   };
 
-  const handlePrizeInput: ChangeEvent<HTMLInputElement>['onChange'] = (event) => {
+  const handlePrizeInput: ChangeEventHandler<HTMLInputElement> = (event) => {
     const next = Number.parseInt(event.target.value, 10);
     if (Number.isNaN(next)) {
       event.target.value = String(prizeCount);
@@ -268,7 +268,7 @@ export default function RewardsPage() {
     setPrizeCount(Math.max(1, next));
   };
 
-  const handleExcludeCompany: ChangeEvent<HTMLSelectElement>['onChange'] = (event) => {
+  const handleExcludeCompany: ChangeEventHandler<HTMLSelectElement> = (event) => {
     const company = event.target.value;
     if (!company) return;
     setExcludedCompanies((prev) => {
@@ -676,18 +676,6 @@ export default function RewardsPage() {
             <EndlessLogo className={styles.logoSvg} />
           </div>
           <div className={styles.headerActions}>
-            {phase === 'spin' && (
-              <button
-                type="button"
-                className={`${ticketButtonStyles.submit} ${ticketButtonStyles.buttonSecondary} ${ticketButtonStyles.buttonSmall}`}
-                onClick={handleBackToSetup}
-                disabled={isRunning}
-              >
-                <span className={`${ticketButtonStyles.buttonLabel} button_main_text u-text-style-main`}>
-                  Back
-                </span>
-              </button>
-            )}
             <button
               type="button"
               className={`${ticketButtonStyles.submit} ${ticketButtonStyles.buttonSecondary} ${ticketButtonStyles.buttonSmall}`}
