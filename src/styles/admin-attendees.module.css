@@ -20,6 +20,15 @@
   padding-bottom: var(--_spacing---space--4);
 }
 
+.headerMeta {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--_spacing---space--2);
+  color: var(--_theme---text-secondary);
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
 .logo {
   display: inline-flex;
   color: var(--_theme---text-secondary);
@@ -33,6 +42,69 @@
 .statusSummary {
   font-size: var(--_typography---font-size--text-small);
   color: var(--_theme---text-secondary);
+  white-space: nowrap;
+}
+
+.refreshButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.35rem;
+  height: 2.35rem;
+  border-radius: var(--radius--tiny);
+  border: 1px solid color-mix(in srgb, var(--_theme---border) 60%, transparent);
+  background: transparent;
+  color: var(--_theme---text-secondary);
+  cursor: pointer;
+  transition: border-color 0.2s ease, color 0.2s ease, background 0.2s ease;
+}
+
+.refreshButton:hover,
+.refreshButton:focus-visible {
+  color: var(--_theme---text-primary);
+  border-color: color-mix(in srgb, var(--_theme---text-secondary) 45%, transparent);
+  background: color-mix(in srgb, var(--_theme---background-2) 35%, transparent);
+}
+
+.refreshButton:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--_theme---text-secondary) 35%, transparent);
+  outline-offset: 2px;
+}
+
+.refreshButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.refreshIcon {
+  width: 1.1rem;
+  height: 1.1rem;
+}
+
+.refreshIconSpinning {
+  animation: refresh-spin 0.9s linear infinite;
+}
+
+.importLink {
+  border: none;
+  background: none;
+  color: var(--_theme---text-secondary);
+  text-decoration: underline;
+  font: inherit;
+  cursor: pointer;
+  padding: 0.1rem 0.2rem;
+}
+
+.importLink:hover,
+.importLink:focus-visible {
+  color: var(--_theme---text-primary);
+  outline: none;
+}
+
+.importLink:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  text-decoration: none;
 }
 
 .actionsBar {
@@ -131,6 +203,15 @@
 .controlButtonDangerFilled:hover,
 .controlButtonDangerFilled:focus-visible {
   filter: brightness(1.05);
+}
+
+@keyframes refresh-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .message {

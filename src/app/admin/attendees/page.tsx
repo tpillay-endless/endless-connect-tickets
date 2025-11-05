@@ -4,6 +4,7 @@ import {
   useCallback,
   useEffect,
   useMemo,
+  useRef,
   useState,
   type ChangeEventHandler,
   type SVGProps,
@@ -56,6 +57,25 @@ type TicketUpdateResponse = {
 type TicketActionResponse = {
   ok: boolean;
   error?: string;
+};
+
+type SendTicketResponse = {
+  ok: boolean;
+  sent?: number;
+  errors?: number;
+  error?: string;
+  message?: string;
+  failures?: Array<{ token: string; error: string }>;
+};
+
+type RebuildTicketsResponse = {
+  ok: boolean;
+  updated?: number;
+  errors?: number;
+  error?: string;
+  message?: string;
+  tickets?: TicketRecord[];
+  failures?: Array<{ token: string; error: string }>;
 };
 
 type BulkDeleteResponse = {
@@ -117,6 +137,24 @@ function TrashIcon(props: SVGProps<SVGSVGElement>) {
   );
 }
 
+function RefreshIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      width={18}
+      height={18}
+      aria-hidden="true"
+      focusable="false"
+      {...props}
+    >
+      <path
+        fill="currentColor"
+        d="M4.93 4.93A10 10 0 0 1 19.07 4l1.4 1.4a1 1 0 0 1-1.42 1.42l-1.13-1.13a8 8 0 1 0 2.18 7.24 1 1 0 1 1 1.94.5A10 10 0 1 1 4.93 4.93Z"
+      />
+    </svg>
+  );
+}
+
 const ALL_COMPANIES = '__ALL_COMPANIES__';
 const NO_COMPANY = '__NO_COMPANY__';
 
@@ -136,9 +174,13 @@ export default function AdminAttendeesPage() {
   const [savingToken, setSavingToken] = useState<string | null>(null);
   const [checkingToken, setCheckingToken] = useState<string | null>(null);
   const [deletingToken, setDeletingToken] = useState<string | null>(null);
+  const [sendingToken, setSendingToken] = useState<string | null>(null);
+  const [bulkSending, setBulkSending] = useState(false);
+  const [bulkRebuilding, setBulkRebuilding] = useState(false);
   const [importing, setImporting] = useState(false);
   const [companyFilter, setCompanyFilter] = useState<string>(ALL_COMPANIES);
   const canManage = !!session && role === 'admin';
+  const importInputRef = useRef<HTMLInputElement | null>(null);
 
   const companyOptions = useMemo(() => {
     const companyNames = new Set<string>();
@@ -321,6 +363,14 @@ export default function AdminAttendeesPage() {
   };
 
   const handleDelete = async (token: string) => {
+    if (typeof window !== 'undefined') {
+      const confirmed = window.confirm(
+        'Are you sure you want to delete this attendee? This action cannot be undone.'
+      );
+      if (!confirmed) {
+        return;
+      }
+    }
     setMenuFor(null);
     setDeletingToken(token);
     try {
@@ -344,6 +394,14 @@ export default function AdminAttendeesPage() {
 
   const handleBulkDelete = async () => {
     if (!selected.length) return;
+    if (typeof window !== 'undefined') {
+      const confirmed = window.confirm(
+        selected.length === 1
+          ? 'Are you sure you want to delete this attendee? This action cannot be undone.'
+          : `Are you sure you want to delete ${selected.length} attendees? This action cannot be undone.`
+      );
+      if (!confirmed) return;
+    }
     try {
       const res = await fetch('/tickets/api/admin/tickets/bulk-delete', {
         method: 'POST',
@@ -363,6 +421,120 @@ export default function AdminAttendeesPage() {
     } catch (err) {
       console.error('[admin attendees] bulk delete failed', err);
       setStatusMessage('error', err instanceof Error ? err.message : 'Bulk delete failed');
+    }
+  };
+
+  const handleBulkSendTickets = async () => {
+    if (!selected.length) return;
+    setBulkSending(true);
+    try {
+      const res = await fetch('/tickets/api/admin/tickets/send', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ tokens: selected }),
+      });
+      const data = (await res.json().catch(() => null)) as SendTicketResponse | null;
+      if (!data) {
+        throw new Error('Failed to send tickets.');
+      }
+      const tone: Message['tone'] =
+        data.ok ? 'success' : data.sent && data.sent > 0 ? 'info' : 'error';
+      const fallback =
+        data.sent && data.sent > 0
+          ? `Sent ${data.sent} ticket${data.sent === 1 ? '' : 's'} with ${
+              data.errors ?? 0
+            } error${(data.errors ?? 0) === 1 ? '' : 's'}.`
+          : 'Failed to send tickets.';
+      const text = data.message || data.error || fallback;
+      if (tone === 'error') {
+        throw new Error(text);
+      }
+      setStatusMessage(tone, text);
+    } catch (err) {
+      console.error('[admin attendees] bulk send failed', err);
+      setStatusMessage(
+        'error',
+        err instanceof Error ? err.message : 'Unable to send tickets.'
+      );
+    } finally {
+      setBulkSending(false);
+    }
+  };
+
+  const handleBulkRebuildTickets = async () => {
+    if (!selected.length) return;
+    setBulkRebuilding(true);
+    try {
+      const res = await fetch('/tickets/api/admin/tickets/rebuild', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ tokens: selected }),
+      });
+      const data = (await res.json().catch(() => null)) as RebuildTicketsResponse | null;
+      if (!data) {
+        throw new Error('Failed to rebuild tickets.');
+      }
+      const tone: Message['tone'] =
+        data.ok ? 'success' : data.updated && data.updated > 0 ? 'info' : 'error';
+      const fallback =
+        data.updated && data.updated > 0
+          ? `Rebuilt ${data.updated} ticket${data.updated === 1 ? '' : 's'} with ${
+              data.errors ?? 0
+            } error${(data.errors ?? 0) === 1 ? '' : 's'}.`
+          : 'Failed to rebuild tickets.';
+      const text = data.message || data.error || fallback;
+      if (Array.isArray(data.tickets) && data.tickets.length) {
+        setTickets((prev) =>
+          prev.map((ticket) => {
+            const updated = data.tickets!.find((t) => t.token === ticket.token);
+            return updated ? { ...ticket, ...updated } : ticket;
+          })
+        );
+      }
+      if (tone === 'error') {
+        throw new Error(text);
+      }
+      setStatusMessage(tone, text);
+    } catch (err) {
+      console.error('[admin attendees] bulk rebuild failed', err);
+      setStatusMessage(
+        'error',
+        err instanceof Error ? err.message : 'Unable to rebuild tickets.'
+      );
+    } finally {
+      setBulkRebuilding(false);
+    }
+  };
+
+  const handleSendTicket = async (token: string) => {
+    setMenuFor(null);
+    setSendingToken(token);
+    try {
+      const res = await fetch('/tickets/api/admin/tickets/send', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ tokens: [token] }),
+      });
+      const data = (await res.json().catch(() => null)) as SendTicketResponse | null;
+      if (!data) {
+        throw new Error('Failed to send ticket.');
+      }
+      const tone: Message['tone'] =
+        data.ok ? 'success' : data.sent && data.sent > 0 ? 'info' : 'error';
+      const fallback =
+        data.sent && data.sent > 0
+          ? 'Ticket email sent.'
+          : 'Failed to send ticket.';
+      const text = data.message || data.error || fallback;
+      if (tone === 'error') {
+        throw new Error(text);
+      }
+      setStatusMessage(tone, text);
+    } catch (err) {
+      console.error('[admin attendees] send ticket failed', err);
+      setStatusMessage('error', err instanceof Error ? err.message : 'Unable to send ticket.');
+    } finally {
+      setSendingToken(null);
     }
   };
 
@@ -504,9 +676,39 @@ export default function AdminAttendeesPage() {
           <div className={styles.logo}>
             <EndlessLogo className={styles.logoSvg} />
           </div>
-          <span className={styles.statusSummary}>
-            {stats.checkedIn} checked in · {stats.total} total
-          </span>
+          <div className={styles.headerMeta}>
+            <button
+              type="button"
+              className={styles.refreshButton}
+              onClick={handleRefresh}
+              disabled={refreshing}
+              aria-label="Refresh attendees"
+            >
+              <RefreshIcon
+                className={cx(styles.refreshIcon, refreshing && styles.refreshIconSpinning)}
+              />
+            </button>
+            <span className={styles.statusSummary}>
+              {stats.checkedIn} checked in · {stats.total} total
+            </span>
+            <button
+              type="button"
+              className={styles.importLink}
+              onClick={() => importInputRef.current?.click()}
+              disabled={importing}
+            >
+              {importing ? 'Importing…' : 'Import CSV'}
+            </button>
+            <input
+              ref={importInputRef}
+              type="file"
+              accept=".csv,text/csv"
+              onChange={handleImport}
+              className={styles.csvInput}
+              hidden
+              disabled={importing}
+            />
+          </div>
         </div>
         <TypographyHeading fontStyle="H1" text="Attendees" />
         <TypographyParagraph
@@ -547,6 +749,22 @@ export default function AdminAttendeesPage() {
               </button>
               <button
                 type="button"
+                className={cx(styles.controlButton, styles.controlButtonSecondary)}
+                onClick={handleBulkRebuildTickets}
+                disabled={bulkRebuilding}
+              >
+                {bulkRebuilding ? 'Rebuilding…' : 'Rebuild tickets'}
+              </button>
+              <button
+                type="button"
+                className={cx(styles.controlButton, styles.controlButtonSecondary)}
+                onClick={handleBulkSendTickets}
+                disabled={bulkSending}
+              >
+                {bulkSending ? 'Sending…' : 'Send ticket'}
+              </button>
+              <button
+                type="button"
                 className={cx(styles.controlButton, styles.controlButtonPrimary)}
                 onClick={() => handleBulkCheck('checkin')}
               >
@@ -561,30 +779,6 @@ export default function AdminAttendeesPage() {
               </button>
             </div>
           )}
-        </div>
-        <div className={styles.actionsRight}>
-          <button
-            type="button"
-            className={styles.controlButton}
-            onClick={handleRefresh}
-            disabled={refreshing}
-          >
-            {refreshing ? 'Refreshing…' : 'Refresh'}
-          </button>
-          <label className={cx(styles.controlButton, styles.controlButtonPrimary)}>
-            {importing ? 'Importing…' : 'Import CSV'}
-            <input
-              type="file"
-              accept=".csv,text/csv"
-              onChange={handleImport}
-              className={styles.csvInput}
-              style={{ display: 'none' }}
-              disabled={importing}
-            />
-          </label>
-          <Link href="/manual-registration" className={styles.controlButton}>
-            Manual registration
-          </Link>
         </div>
       </div>
 
@@ -605,7 +799,7 @@ export default function AdminAttendeesPage() {
           <div className={styles.emptyState}>Loading attendees…</div>
         ) : tickets.length === 0 ? (
           <div className={styles.emptyState}>
-            No attendees found yet. Import a CSV or add someone manually to get started.
+            No attendees found yet. Import a CSV to get started.
           </div>
         ) : filteredTickets.length === 0 ? (
           <div className={styles.emptyState}>No attendees match the selected company.</div>
@@ -636,6 +830,7 @@ export default function AdminAttendeesPage() {
                   const isEditing = editing === ticket.token;
                   const isSaving = savingToken === ticket.token;
                   const isDeleting = deletingToken === ticket.token;
+                  const isSending = sendingToken === ticket.token;
                   const draftValues = draft ?? {
                     name: '',
                     email: '',
@@ -805,6 +1000,16 @@ export default function AdminAttendeesPage() {
                                       onClick={() => handleEdit(ticket)}
                                     >
                                       Edit details
+                                    </button>
+                                  </li>
+                                  <li>
+                                    <button
+                                      type="button"
+                                      className={styles.menuItem}
+                                      onClick={() => handleSendTicket(ticket.token)}
+                                      disabled={isSending}
+                                    >
+                                      {isSending ? 'Sending…' : 'Send ticket'}
                                     </button>
                                   </li>
                                   <li>

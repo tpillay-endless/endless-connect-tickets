@@ -13,6 +13,7 @@
     "import-attendees": "tsx scripts/import-attendees.ts"
   },
   "dependencies": {
+    "@sendgrid/mail": "^8.1.6",
     "dotenv": "^17.2.3",
     "libphonenumber-js": "^1.12.25",
     "next": "15.2.5",
