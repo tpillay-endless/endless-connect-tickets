@@ -1,14 +1,15 @@
 import { NextResponse } from 'next/server';
 import { readSessionFromCookie } from '@/lib/staff';
+import { roleHasPermission } from '@/lib/staff/permissions';
 import { getTicket, putTicket, type TicketRecord } from '@/lib/ticketsDb';
 import { buildTicketPngUrl, buildVCard, buildVCardSvgUrl } from '@/lib/qr';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
-async function requireAdmin(req: Request) {
+async function requireRebuildAccess(req: Request) {
   const session = await readSessionFromCookie(req.headers.get('cookie') || undefined);
-  if (!session || session.role !== 'admin') {
+  if (!session || !roleHasPermission(session.role, 'rebuildTickets')) {
     return null;
   }
   return session;
@@ -19,7 +20,7 @@ type RebuildTicketsBody = {
 };
 
 export async function POST(req: Request) {
-  const session = await requireAdmin(req);
+  const session = await requireRebuildAccess(req);
   if (!session) {
     return NextResponse.json({ ok: false, error: 'Forbidden' }, { status: 403 });
   }

@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server';
 import { buildAllQR } from '@/lib/qr';
 import { addTicketToIndex, putTicket, type TicketRecord } from '@/lib/ticketsDb';
 import { readSessionFromCookie } from '@/lib/staff';
+import { roleHasPermission } from '@/lib/staff/permissions';
 import { getStore, setStore } from '@/lib/ticketStore';
 
 export const dynamic = 'force-dynamic';
@@ -37,7 +38,7 @@ function normalizeRow(row: Record<string, unknown>): NormalizedRow | null {
 
 export async function POST(req: Request) {
   const me = await readSessionFromCookie(req.headers.get('cookie') || undefined);
-  if (!me || me.role !== 'admin') {
+  if (!me || !roleHasPermission(me.role, 'importExportTickets')) {
     return NextResponse.json({ ok: false, error: 'Forbidden' }, { status: 403 });
   }
 

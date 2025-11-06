@@ -1,14 +1,15 @@
 import { NextResponse } from 'next/server';
 import { readSessionFromCookie } from '@/lib/staff';
+import { roleHasPermission } from '@/lib/staff/permissions';
 import { getTicket } from '@/lib/ticketsDb';
 import { sendTicketEmail } from '@/lib/sendgrid';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
-async function requireAdmin(req: Request) {
+async function requireTicketSender(req: Request) {
   const session = await readSessionFromCookie(req.headers.get('cookie') || undefined);
-  if (!session || session.role !== 'admin') {
+  if (!session || !roleHasPermission(session.role, 'sendTickets')) {
     return null;
   }
   return session;
@@ -19,7 +20,7 @@ type SendTicketsBody = {
 };
 
 export async function POST(req: Request) {
-  const session = await requireAdmin(req);
+  const session = await requireTicketSender(req);
   if (!session) {
     return NextResponse.json({ ok: false, error: 'Forbidden' }, { status: 403 });
   }
@@ -79,4 +80,3 @@ export async function POST(req: Request) {
     { status }
   );
 }
-

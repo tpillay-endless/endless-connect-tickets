@@ -2,6 +2,7 @@
 import { NextResponse } from 'next/server';
 import { putStaffUser, hashPassword } from '@/lib/staff';
 import { randomUUID } from 'crypto';
+import type { StaffRole } from '@/lib/staff/permissions';
 
 async function runSeed(url: string) {
   const u = new URL(url);
@@ -11,11 +12,12 @@ async function runSeed(url: string) {
     return NextResponse.json({ ok: false, error: 'Unauthorized' }, { status: 401 });
   }
 
-  const plan: Array<{ name: string; role: 'admin' | 'staff'; passEnv: string }> = [
-    { name: 'Goran', role: 'admin', passEnv: 'STAFF_GORAN_PASS' },
+  const plan: Array<{ name: string; role: StaffRole; passEnv: string }> = [
+    { name: 'Goran', role: 'superadmin', passEnv: 'STAFF_GORAN_PASS' },
     { name: 'Teddy', role: 'admin', passEnv: 'STAFF_TEDDY_PASS' },
-    { name: 'Alice', role: 'staff', passEnv: 'STAFF_ALICE_PASS' },
-    { name: 'Bob',   role: 'staff', passEnv: 'STAFF_BOB_PASS'   },
+    { name: 'Skyler', role: 'host', passEnv: 'STAFF_SKYLER_PASS' },
+    { name: 'Jerrika', role: 'staff', passEnv: 'STAFF_JERRIKA_PASS' },
+    { name: 'David', role: 'staff', passEnv: 'STAFF_DAVID_PASS' },
   ];
 
   const created: string[] = [];

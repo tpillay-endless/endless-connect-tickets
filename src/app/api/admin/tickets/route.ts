@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { listTickets } from '@/lib/ticketsDb';
 import { readSessionFromCookie } from '@/lib/staff';
+import { roleHasPermission } from '@/lib/staff/permissions';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -11,7 +12,7 @@ function forbidden() {
 
 export async function GET(req: Request) {
   const me = await readSessionFromCookie(req.headers.get('cookie') || undefined);
-  if (!me || me.role !== 'admin') {
+  if (!me || !roleHasPermission(me.role, 'viewAttendeeList')) {
     return forbidden();
   }
 

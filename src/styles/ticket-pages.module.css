@@ -200,6 +200,54 @@
   }
 }
 
+.toolSection {
+  display: grid;
+  gap: var(--_spacing---space--3);
+}
+
+.toolEyebrow {
+  color: var(--_theme---text-secondary);
+  letter-spacing: var(--_typography---letter-spacing--wide);
+}
+
+.toolGrid {
+  display: grid;
+  gap: var(--_spacing---space--4);
+  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+}
+
+.toolCard {
+  display: grid;
+  gap: var(--_spacing---space--2);
+  padding: var(--_spacing---space--5);
+  border-radius: var(--radius--small, 12px);
+  border: 1px solid color-mix(in srgb, var(--_theme---border) 70%, transparent);
+  background: color-mix(in srgb, var(--_theme---background-2) 40%, transparent);
+  color: inherit;
+  text-decoration: none;
+  transition: border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
+}
+
+.toolCard:hover,
+.toolCard:focus-visible {
+  border-color: color-mix(in srgb, var(--_theme---border) 20%, transparent);
+  box-shadow: 0 14px 28px rgba(0, 0, 0, 0.12);
+  transform: translateY(-2px);
+}
+
+.toolCardLabel {
+  font-family: "Owners Xwide", Arial, sans-serif;
+  font-size: var(--_typography---font-size--h4);
+  letter-spacing: var(--_typography---letter-spacing--tight);
+  line-height: 1.1;
+}
+
+.toolCardDescription {
+  font-family: "Owners Text", Arial, sans-serif;
+  font-size: var(--_typography---font-size--text-main);
+  color: var(--_theme---text-secondary);
+}
+
 .resultCard {
   display: grid;
   gap: var(--_spacing---space--4);

@@ -1,5 +1,6 @@
 // src/lib/staff.ts
 import { randomUUID } from 'crypto';
+import type { StaffRole } from '@/lib/staff/permissions';
 
 /** ---------- KV (Upstash) tiny helpers ---------- */
 const KV = {
@@ -39,7 +40,7 @@ export type StaffUser = {
   id: string;
   name: string;
   nameLower: string;           // login key, case-insensitive
-  role: 'admin' | 'staff';
+  role: StaffRole;
   passHash: string;            // base64
   salt: string;                // base64
   createdAt: string;
@@ -48,7 +49,7 @@ export type StaffSession = {
   id: string;
   userId: string;
   name: string;
-  role: 'admin' | 'staff';
+  role: StaffRole;
   createdAt: string;
 };
 
@@ -100,7 +101,7 @@ export async function verifyPassword(password: string, u: StaffUser) {
 export async function upsertStaffUser(
   name: string,
   password: string,
-  role: 'admin' | 'staff'
+  role: StaffRole
 ) {
   const nameLower = (name || '').toLowerCase().trim();
   const { salt, hash } = await hashPassword(password);

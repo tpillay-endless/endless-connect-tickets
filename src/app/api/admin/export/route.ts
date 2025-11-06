@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
-import { readSessionFromCookie } from '../../../../lib/staff';
+import { readSessionFromCookie } from '@/lib/staff';
+import { roleHasPermission } from '@/lib/staff/permissions';
 
 type Ticket = {
   token: string;
@@ -76,9 +77,9 @@ function ticketsToCsv(rows: Ticket[]) {
 }
 
 export async function GET(req: Request) {
-  // Auth: only admins
+  // Auth: admins and super admins
   const me = await readSessionFromCookie(req.headers.get('cookie') || undefined);
-  if (!me || me.role !== 'admin') {
+  if (!me || !roleHasPermission(me.role, 'importExportTickets')) {
     return NextResponse.json({ ok: false, error: 'Forbidden' }, { status: 403 });
   }
   if (!API.url || !API.token) {

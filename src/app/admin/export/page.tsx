@@ -4,6 +4,8 @@ import { useEffect, useState } from 'react';
 import styles from '@/styles/ticket-pages.module.css';
 import { EndlessLogo } from '@/components/EndlessLogo';
 import { TypographyHeading, TypographyParagraph } from '@/components/WebflowTypography';
+import { roleHasPermission, STAFF_ROLE_LABELS } from '@/lib/staff/permissions';
+import type { StaffRole } from '@/lib/staff/permissions';
 
 const EYEBROW_TEXT_CLASSES = 'eyebrow_text u-text-style-tiny u-text-transform-uppercase u-weight-medium';
 
@@ -26,8 +28,11 @@ export default function AdminExport() {
           error?: string;
         };
         const j = (await r.json().catch(() => null)) as StaffMeResponse | null;
-        if (j?.ok && j.user?.role === 'admin') setAuth({ ok: true, name: j.user.name, role: j.user.role });
-        else setErr('Admins only.');
+        if (j?.ok && j.user?.role && roleHasPermission(j.user.role as StaffRole, 'importExportTickets')) {
+          setAuth({ ok: true, name: j.user.name, role: j.user.role });
+        } else {
+          setErr('Admins or super admins only.');
+        }
       } catch {
         setErr('Auth check failed.');
       }
@@ -37,6 +42,7 @@ export default function AdminExport() {
   const statusIsError = err && !auth.ok;
   const statusVariant = statusIsError ? styles.statusError : styles.statusOk;
   const statusMessage = formatStatusLabel(auth.ok ? 'Ready' : err || 'Checking permissions…');
+  const displayRole = auth.role ? STAFF_ROLE_LABELS[auth.role as StaffRole] ?? auth.role : undefined;
 
   return (
     <main className={styles.page}>
@@ -75,7 +81,8 @@ export default function AdminExport() {
               fontStyle="Text Main"
               text={
                 <>
-                  Logged in as <strong>{auth.name}</strong> (admin)
+                  Logged in as <strong>{auth.name}</strong>{' '}
+                  {displayRole ? `(${displayRole})` : null}
                 </>
               }
             />

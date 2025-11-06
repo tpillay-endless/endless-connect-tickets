@@ -15,6 +15,7 @@ import styles from '@/styles/admin-attendees.module.css';
 import { EndlessLogo } from '@/components/EndlessLogo';
 import { TypographyHeading, TypographyParagraph } from '@/components/WebflowTypography';
 import { useStaffSession } from '@/hooks/useStaffSession';
+import { getRoleCapabilities, rolesWithPermissions } from '@/lib/staff/permissions';
 
 type TicketRecord = {
   token: string;
@@ -157,10 +158,11 @@ function RefreshIcon(props: SVGProps<SVGSVGElement>) {
 
 const ALL_COMPANIES = '__ALL_COMPANIES__';
 const NO_COMPANY = '__NO_COMPANY__';
+const ATTENDEE_PAGE_ROLES = rolesWithPermissions('manageAttendees', 'checkIn');
 
 export default function AdminAttendeesPage() {
   const { session, loading: authLoading, error: authError, role } = useStaffSession({
-    requiredRole: 'admin',
+    allowedRoles: ATTENDEE_PAGE_ROLES,
   });
 
   const [tickets, setTickets] = useState<TicketRecord[]>([]);
@@ -179,7 +181,16 @@ export default function AdminAttendeesPage() {
   const [bulkRebuilding, setBulkRebuilding] = useState(false);
   const [importing, setImporting] = useState(false);
   const [companyFilter, setCompanyFilter] = useState<string>(ALL_COMPANIES);
-  const canManage = !!session && role === 'admin';
+  const permissions = useMemo(() => getRoleCapabilities(role), [role]);
+  const canManageAttendees = !!session && permissions.canAccessAttendees;
+  const canViewAttendees = !!session && (permissions.canAccessAttendees || permissions.canAccessCheckIn);
+  const canImportExport = !!session && permissions.canImportExport;
+  const canBulkDelete = !!session && permissions.canBulkDeleteAttendees;
+  const canBulkRebuild = !!session && permissions.canRebuildTickets;
+  const canSendTickets = !!session && permissions.canSendTickets;
+  const canDeleteAttendee = !!session && permissions.canDeleteAttendee;
+  const canCheckIn = !!session && permissions.canAccessCheckIn;
+  const canBulkCheck = canCheckIn;
   const importInputRef = useRef<HTMLInputElement | null>(null);
 
   const companyOptions = useMemo(() => {
@@ -250,7 +261,7 @@ export default function AdminAttendeesPage() {
 
   const fetchTickets = useCallback(
     async (opts?: { silent?: boolean }) => {
-      if (!canManage) return;
+      if (!canViewAttendees) return;
       if (opts?.silent) setRefreshing(true);
       else setLoading(true);
       try {
@@ -269,14 +280,14 @@ export default function AdminAttendeesPage() {
         else setLoading(false);
       }
     },
-    [canManage, setStatusMessage]
+    [canViewAttendees, setStatusMessage]
   );
 
   useEffect(() => {
-    if (canManage) {
+    if (canViewAttendees) {
       fetchTickets();
     }
-  }, [canManage, fetchTickets]);
+  }, [canViewAttendees, fetchTickets]);
 
   useEffect(() => {
     if (!menuFor) return;
@@ -308,6 +319,7 @@ export default function AdminAttendeesPage() {
   };
 
   const handleEdit = (ticket: TicketRecord) => {
+    if (!canManageAttendees) return;
     setMenuFor(null);
     setEditing(ticket.token);
     setDraft({
@@ -328,7 +340,7 @@ export default function AdminAttendeesPage() {
   };
 
   const handleSaveEdit = async (token: string) => {
-    if (!draft) return;
+    if (!draft || !canManageAttendees) return;
     const payload = {
       name: draft.name.trim(),
       email: draft.email.trim(),
@@ -363,6 +375,7 @@ export default function AdminAttendeesPage() {
   };
 
   const handleDelete = async (token: string) => {
+    if (!canDeleteAttendee) return;
     if (typeof window !== 'undefined') {
       const confirmed = window.confirm(
         'Are you sure you want to delete this attendee? This action cannot be undone.'
@@ -394,6 +407,7 @@ export default function AdminAttendeesPage() {
 
   const handleBulkDelete = async () => {
     if (!selected.length) return;
+    if (!canBulkDelete) return;
     if (typeof window !== 'undefined') {
       const confirmed = window.confirm(
         selected.length === 1
@@ -426,6 +440,7 @@ export default function AdminAttendeesPage() {
 
   const handleBulkSendTickets = async () => {
     if (!selected.length) return;
+    if (!canSendTickets) return;
     setBulkSending(true);
     try {
       const res = await fetch('/tickets/api/admin/tickets/send', {
@@ -463,6 +478,7 @@ export default function AdminAttendeesPage() {
 
   const handleBulkRebuildTickets = async () => {
     if (!selected.length) return;
+    if (!canBulkRebuild) return;
     setBulkRebuilding(true);
     try {
       const res = await fetch('/tickets/api/admin/tickets/rebuild', {
@@ -507,6 +523,7 @@ export default function AdminAttendeesPage() {
   };
 
   const handleSendTicket = async (token: string) => {
+    if (!canSendTickets) return;
     setMenuFor(null);
     setSendingToken(token);
     try {
@@ -540,6 +557,7 @@ export default function AdminAttendeesPage() {
 
   const handleBulkCheck = async (action: 'checkin' | 'undo') => {
     if (!selected.length) return;
+    if (!canBulkCheck) return;
     try {
       const requests = selected.map((token) =>
         fetch('/tickets/api/verify', {
@@ -572,6 +590,7 @@ export default function AdminAttendeesPage() {
   };
 
   const handleToggleCheckIn = async (ticket: TicketRecord) => {
+    if (!canCheckIn) return;
     setMenuFor(null);
     setCheckingToken(ticket.token);
     const action = ticket.checkedIn ? 'undo' : 'checkin';
@@ -600,6 +619,10 @@ export default function AdminAttendeesPage() {
   };
 
   const handleImport: ChangeEventHandler<HTMLInputElement> = async (event) => {
+    if (!canImportExport) {
+      event.target.value = '';
+      return;
+    }
     const file = event.target.files?.[0];
     if (!file) return;
     setImporting(true);
@@ -650,16 +673,16 @@ export default function AdminAttendeesPage() {
     );
   }
 
-  if (!canManage) {
+  if (!canViewAttendees) {
     return (
       <main className={styles.page}>
-        <TypographyHeading fontStyle="H2" text="Admin Access Required" />
+        <TypographyHeading fontStyle="H2" text="Access Restricted" />
         <TypographyParagraph
           fontStyle="Text Main"
           text={
             <>
               {authError === 'Unauthorized'
-                ? 'Only administrators can manage attendees.'
+                ? 'Only admin and staff accounts can view the attendee dashboard.'
                 : authError || 'Please sign in to continue.'}{' '}
               <Link href="/login">Go to the admin login page.</Link>
             </>
@@ -691,23 +714,27 @@ export default function AdminAttendeesPage() {
             <span className={styles.statusSummary}>
               {stats.checkedIn} checked in · {stats.total} total
             </span>
-            <button
-              type="button"
-              className={styles.importLink}
-              onClick={() => importInputRef.current?.click()}
-              disabled={importing}
-            >
-              {importing ? 'Importing…' : 'Import CSV'}
-            </button>
-            <input
-              ref={importInputRef}
-              type="file"
-              accept=".csv,text/csv"
-              onChange={handleImport}
-              className={styles.csvInput}
-              hidden
-              disabled={importing}
-            />
+            {canImportExport && (
+              <>
+                <button
+                  type="button"
+                  className={styles.importLink}
+                  onClick={() => importInputRef.current?.click()}
+                  disabled={importing}
+                >
+                  {importing ? 'Importing…' : 'Import CSV'}
+                </button>
+                <input
+                  ref={importInputRef}
+                  type="file"
+                  accept=".csv,text/csv"
+                  onChange={handleImport}
+                  className={styles.csvInput}
+                  hidden
+                  disabled={importing}
+                />
+              </>
+            )}
           </div>
         </div>
         <TypographyHeading fontStyle="H1" text="Attendees" />
@@ -738,45 +765,55 @@ export default function AdminAttendeesPage() {
                 fontStyle="Text Small"
                 text={`${selected.length} selected`}
               />
-              <button
-                type="button"
-                className={cx(styles.controlButton, styles.controlButtonDangerFilled)}
-                onClick={handleBulkDelete}
-                aria-label="Delete selected attendees"
-              >
-                <TrashIcon className={styles.actionIcon} />
-                <span className={styles.srOnly}>Delete selected</span>
-              </button>
-              <button
-                type="button"
-                className={cx(styles.controlButton, styles.controlButtonSecondary)}
-                onClick={handleBulkRebuildTickets}
-                disabled={bulkRebuilding}
-              >
-                {bulkRebuilding ? 'Rebuilding…' : 'Rebuild tickets'}
-              </button>
-              <button
-                type="button"
-                className={cx(styles.controlButton, styles.controlButtonSecondary)}
-                onClick={handleBulkSendTickets}
-                disabled={bulkSending}
-              >
-                {bulkSending ? 'Sending…' : 'Send ticket'}
-              </button>
-              <button
-                type="button"
-                className={cx(styles.controlButton, styles.controlButtonPrimary)}
-                onClick={() => handleBulkCheck('checkin')}
-              >
-                Check-in all
-              </button>
-              <button
-                type="button"
-                className={cx(styles.controlButton, styles.controlButtonSecondary)}
-                onClick={() => handleBulkCheck('undo')}
-              >
-                Check-out all
-              </button>
+              {canBulkDelete && (
+                <button
+                  type="button"
+                  className={cx(styles.controlButton, styles.controlButtonDangerFilled)}
+                  onClick={handleBulkDelete}
+                  aria-label="Delete selected attendees"
+                >
+                  <TrashIcon className={styles.actionIcon} />
+                  <span className={styles.srOnly}>Delete selected</span>
+                </button>
+              )}
+              {canBulkRebuild && (
+                <button
+                  type="button"
+                  className={cx(styles.controlButton, styles.controlButtonSecondary)}
+                  onClick={handleBulkRebuildTickets}
+                  disabled={bulkRebuilding}
+                >
+                  {bulkRebuilding ? 'Rebuilding…' : 'Rebuild tickets'}
+                </button>
+              )}
+              {canSendTickets && (
+                <button
+                  type="button"
+                  className={cx(styles.controlButton, styles.controlButtonSecondary)}
+                  onClick={handleBulkSendTickets}
+                  disabled={bulkSending}
+                >
+                  {bulkSending ? 'Sending…' : 'Send ticket'}
+                </button>
+              )}
+              {canBulkCheck && (
+                <>
+                  <button
+                    type="button"
+                    className={cx(styles.controlButton, styles.controlButtonPrimary)}
+                    onClick={() => handleBulkCheck('checkin')}
+                  >
+                    Check-in all
+                  </button>
+                  <button
+                    type="button"
+                    className={cx(styles.controlButton, styles.controlButtonSecondary)}
+                    onClick={() => handleBulkCheck('undo')}
+                  >
+                    Check-out all
+                  </button>
+                </>
+              )}
             </div>
           )}
         </div>
@@ -831,14 +868,18 @@ export default function AdminAttendeesPage() {
                   const isSaving = savingToken === ticket.token;
                   const isDeleting = deletingToken === ticket.token;
                   const isSending = sendingToken === ticket.token;
-                  const draftValues = draft ?? {
-                    name: '',
-                    email: '',
-                    phone: '',
-                    company: '',
-                  };
-                  return (
-                    <tr key={ticket.token}>
+                const draftValues = draft ?? {
+                  name: '',
+                  email: '',
+                  phone: '',
+                  company: '',
+                };
+                const showEditOption = canManageAttendees;
+                const showSendOption = canSendTickets;
+                const showDeleteOption = canDeleteAttendee;
+                const hasRowMenuActions = showEditOption || showSendOption || showDeleteOption;
+                return (
+                  <tr key={ticket.token}>
                       <td className={styles.selectionCell}>
                         <input
                           type="checkbox"
@@ -940,7 +981,7 @@ export default function AdminAttendeesPage() {
                             checkingToken === ticket.token && styles.statusToggleBusy
                           )}
                           onClick={() => handleToggleCheckIn(ticket)}
-                          disabled={checkingToken === ticket.token}
+                          disabled={checkingToken === ticket.token || !canCheckIn}
                           title={
                             ticket.checkedIn
                               ? `Mark ${ticket.name} as not checked in`
@@ -962,7 +1003,7 @@ export default function AdminAttendeesPage() {
                               type="button"
                               className={cx(styles.rowActionButton, styles.rowActionPrimary)}
                               onClick={() => handleSaveEdit(ticket.token)}
-                              disabled={isSaving}
+                              disabled={isSaving || !canManageAttendees}
                             >
                               {isSaving ? 'Saving…' : 'Save'}
                             </button>
@@ -975,7 +1016,7 @@ export default function AdminAttendeesPage() {
                               Cancel
                             </button>
                           </div>
-                        ) : (
+                        ) : hasRowMenuActions ? (
                           <div className={styles.menuCellContent} data-attendee-menu="true">
                             <button
                               type="button"
@@ -993,40 +1034,46 @@ export default function AdminAttendeesPage() {
                             {menuFor === ticket.token && (
                               <div className={styles.menuPanel} data-attendee-menu="true" role="menu">
                                 <ul className={styles.menuList}>
-                                  <li>
-                                    <button
-                                      type="button"
-                                      className={styles.menuItem}
-                                      onClick={() => handleEdit(ticket)}
-                                    >
-                                      Edit details
-                                    </button>
-                                  </li>
-                                  <li>
-                                    <button
-                                      type="button"
-                                      className={styles.menuItem}
-                                      onClick={() => handleSendTicket(ticket.token)}
-                                      disabled={isSending}
-                                    >
-                                      {isSending ? 'Sending…' : 'Send ticket'}
-                                    </button>
-                                  </li>
-                                  <li>
-                                    <button
-                                      type="button"
-                                      className={styles.menuItem}
-                                      onClick={() => handleDelete(ticket.token)}
-                                      disabled={isDeleting}
-                                    >
-                                      {isDeleting ? 'Deleting…' : 'Delete'}
-                                    </button>
-                                  </li>
+                                  {showEditOption && (
+                                    <li>
+                                      <button
+                                        type="button"
+                                        className={styles.menuItem}
+                                        onClick={() => handleEdit(ticket)}
+                                      >
+                                        Edit details
+                                      </button>
+                                    </li>
+                                  )}
+                                  {showSendOption && (
+                                    <li>
+                                      <button
+                                        type="button"
+                                        className={styles.menuItem}
+                                        onClick={() => handleSendTicket(ticket.token)}
+                                        disabled={isSending}
+                                      >
+                                        {isSending ? 'Sending…' : 'Send ticket'}
+                                      </button>
+                                    </li>
+                                  )}
+                                  {showDeleteOption && (
+                                    <li>
+                                      <button
+                                        type="button"
+                                        className={styles.menuItem}
+                                        onClick={() => handleDelete(ticket.token)}
+                                        disabled={isDeleting}
+                                      >
+                                        {isDeleting ? 'Deleting…' : 'Delete'}
+                                      </button>
+                                    </li>
+                                  )}
                                 </ul>
                               </div>
                             )}
                           </div>
-                        )}
+                        ) : null}
                       </td>
                     </tr>
                   );

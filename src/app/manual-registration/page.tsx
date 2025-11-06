@@ -7,6 +7,7 @@ import styles from '@/styles/ticket-pages.module.css';
 import { EndlessLogo } from '@/components/EndlessLogo';
 import { TypographyHeading, TypographyParagraph } from '@/components/WebflowTypography';
 import { useStaffSession } from '@/hooks/useStaffSession';
+import { getRoleCapabilities, STAFF_PERMISSION_GROUPS, STAFF_ROLE_LABELS } from '@/lib/staff/permissions';
 
 const EYEBROW_TEXT_CLASSES = 'eyebrow_text u-text-style-tiny u-text-transform-uppercase u-weight-medium';
 const STATUS_DISPLAY_OVERRIDES: Record<string, string> = {
@@ -31,7 +32,9 @@ function formatStatusLabel(value: string) {
 }
 
 export default function ManualRegistrationPage() {
-  const { session, loading, error, role } = useStaffSession({ requiredRole: 'admin' });
+  const { session, loading, error, role } = useStaffSession({
+    allowedRoles: STAFF_PERMISSION_GROUPS.manualRegistration,
+  });
   const [status, setStatus] = useState<string>('ready');
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -78,8 +81,8 @@ export default function ManualRegistrationPage() {
   const authStatusLabel = useMemo(() => {
     if (loading) return 'Checking permissions…';
     if (error) {
-      if (error === 'Unauthorized') return 'Admins only.';
-      if (error === 'No active session') return 'Please sign in as an admin.';
+      if (error === 'Unauthorized') return 'Admins, super admins, or staff only.';
+      if (error === 'No active session') return 'Please sign in with an authorized staff account.';
       return error;
     }
     return 'Ready';
@@ -91,7 +94,9 @@ export default function ManualRegistrationPage() {
     return styles.statusOk;
   }, [loading, error]);
 
-  const canRegister = !!session && role === 'admin';
+  const permissions = useMemo(() => getRoleCapabilities(role), [role]);
+  const canRegister = !!session && permissions.canUseManualRegistration;
+  const roleLabel = role ? STAFF_ROLE_LABELS[role] ?? role : null;
 
   return (
     <main className={styles.page}>
@@ -126,7 +131,9 @@ export default function ManualRegistrationPage() {
             fontStyle="Text Main"
             text={
               <>
-                {loading ? 'Validating your session…' : authStatusLabel || 'Admins only.'}{' '}
+                {loading
+                  ? 'Validating your session…'
+                  : authStatusLabel || 'Only authorized staff can use manual registration.'}{' '}
                 <Link href="/login">Go to the admin login page.</Link>
               </>
             }
@@ -140,7 +147,7 @@ export default function ManualRegistrationPage() {
                 fontStyle="Text Main"
                 text={
                   <>
-                    Logged in as <strong>{session?.name}</strong> ({role})
+                    Logged in as <strong>{session?.name}</strong> ({roleLabel ?? role})
                   </>
                 }
               />

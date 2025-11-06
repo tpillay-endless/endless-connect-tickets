@@ -2,14 +2,15 @@ import { NextResponse } from 'next/server';
 import { buildAllQR } from '@/lib/qr';
 import { deleteTickets, getTicket, listTickets, putTicket } from '@/lib/ticketsDb';
 import { readSessionFromCookie } from '@/lib/staff';
+import { roleHasPermission } from '@/lib/staff/permissions';
 import { getStore, setStore } from '@/lib/ticketStore';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
-async function requireAdmin(req: Request) {
+async function requireManager(req: Request) {
   const me = await readSessionFromCookie(req.headers.get('cookie') || undefined);
-  if (!me || me.role !== 'admin') {
+  if (!me || !roleHasPermission(me.role, 'manageAttendees')) {
     return null;
   }
   return me;
@@ -18,7 +19,7 @@ async function requireAdmin(req: Request) {
 type RouteContext = { params: Promise<{ token: string }> };
 
 export async function PATCH(req: Request, context: RouteContext) {
-  const session = await requireAdmin(req);
+  const session = await requireManager(req);
   if (!session) {
     return NextResponse.json({ ok: false, error: 'Forbidden' }, { status: 403 });
   }
@@ -77,7 +78,7 @@ export async function PATCH(req: Request, context: RouteContext) {
 }
 
 export async function DELETE(req: Request, context: RouteContext) {
-  const session = await requireAdmin(req);
+  const session = await requireManager(req);
   if (!session) {
     return NextResponse.json({ ok: false, error: 'Forbidden' }, { status: 403 });
   }

@@ -13,6 +13,7 @@ import styles from '@/styles/admin-rewards.module.css';
 import { EndlessLogo } from '@/components/EndlessLogo';
 import { TypographyHeading, TypographyParagraph } from '@/components/WebflowTypography';
 import { useStaffSession } from '@/hooks/useStaffSession';
+import { getRoleCapabilities, STAFF_PERMISSION_GROUPS } from '@/lib/staff/permissions';
 import type { TicketRecord } from '@/lib/ticketsDb';
 import ticketButtonStyles from '@/styles/ticket-pages.module.css';
 
@@ -94,7 +95,7 @@ function toDisplay(ticket: TicketRecord | WinnerDisplay): WinnerDisplay {
 
 export default function RewardsPage() {
   const { session, loading: authLoading, error: authError, role } = useStaffSession({
-    requiredRole: 'admin',
+    allowedRoles: STAFF_PERMISSION_GROUPS.rewards,
   });
   const [attendees, setAttendees] = useState<TicketRecord[]>([]);
   const [loading, setLoading] = useState(true);
@@ -118,7 +119,8 @@ export default function RewardsPage() {
   const backButtonRef = useRef<HTMLButtonElement | null>(null);
   const spinProgressRef = useRef(0);
 
-  const canManage = !!session && role === 'admin';
+  const permissions = useMemo(() => getRoleCapabilities(role), [role]);
+  const canRunRewards = !!session && permissions.canAccessRewards;
 
   const normalizedExcluded = useMemo(
     () => new Set(excludedCompanies.map((c) => c.trim().toLowerCase()).filter(Boolean)),
@@ -161,7 +163,7 @@ export default function RewardsPage() {
 
   const fetchAttendees = useCallback(
     async (opts?: { silent?: boolean }) => {
-      if (!canManage) return;
+      if (!canRunRewards || !permissions.canViewAttendeeList) return;
       if (opts?.silent) setRefreshing(true);
       else setLoading(true);
       try {
@@ -183,7 +185,7 @@ export default function RewardsPage() {
         else setLoading(false);
       }
     },
-    [canManage]
+    [canRunRewards, permissions.canViewAttendeeList]
   );
 
   const clearTimers = useCallback(() => {
@@ -194,8 +196,8 @@ export default function RewardsPage() {
   }, []);
 
   useEffect(() => {
-    if (canManage) fetchAttendees();
-  }, [canManage, fetchAttendees]);
+    if (canRunRewards) fetchAttendees();
+  }, [canRunRewards, fetchAttendees]);
 
   useEffect(
     () => () => {
@@ -486,20 +488,20 @@ export default function RewardsPage() {
     return (
       <main className={styles.page}>
         <TypographyHeading fontStyle="H2" text="Loading rewards…" />
-        <TypographyParagraph fontStyle="Text Main" text="Validating admin access." />
+        <TypographyParagraph fontStyle="Text Main" text="Validating access." />
       </main>
     );
   }
 
-  if (!canManage) {
+  if (!canRunRewards) {
     return (
       <main className={styles.page}>
-        <TypographyHeading fontStyle="H2" text="Admin Access Required" />
+        <TypographyHeading fontStyle="H2" text="Access Restricted" />
         <TypographyParagraph
           fontStyle="Text Main"
           text={
             <>
-              {authError || 'Please sign in to use the rewards tool.'}{' '}
+              {authError || 'Only hosts, admins, and super admins can use the rewards tool.'}{' '}
               <Link href="/login">Go to login</Link>.
             </>
           }
@@ -524,7 +526,12 @@ export default function RewardsPage() {
     spinnerDimmed && styles.slotBlurred,
     finalState && styles.slotBlurredFinal
   );
-  const showWinnerOverlay = finalState && winners.length > 0;
+  const hasWinners = winners.length > 0;
+  const winnerOverlayClassName = cx(
+    styles.winnerOverlay,
+    hasWinners && styles.winnerOverlayVisible,
+    finalState && styles.winnerOverlayFinal
+  );
   if (phase === 'spin') {
     return (
       <main className={styles.spinPage}>
@@ -616,12 +623,12 @@ export default function RewardsPage() {
             </div>
           )}
         </div>
-        {showWinnerOverlay && (
-          <div className={styles.winnerOverlay}>
+        {hasWinners && (
+          <div className={winnerOverlayClassName}>
             <TypographyParagraph
-              fontStyle="Text Tiny"
+              fontStyle="Text Small"
               classes={styles.winnerLabel}
-              text="Rewards awarded"
+              text="Winners"
             />
             <ul className={styles.winnerOverlayList}>
               {winners.map((winner) => (

@@ -2236,7 +2236,7 @@ textarea.w-select {
   --swatch--light-200: #dadfdd;
   --swatch--light-300: #c4c9c7;
   --swatch--dark-800: color-mix(in srgb,var(--swatch--dark-900), var(--swatch--light-100) 10%);
-  --swatch--dark-900: #000b07;
+  --swatch--dark-900: color-mix(in srgb, var(--swatch--brand-500), black 85%);
   --swatch--dark-900-o20: color-mix(in srgb, var(--swatch--dark-900) 20%, transparent);
   --swatch--brand-100: color-mix(in srgb,var(--swatch--brand-500), white 80%);
   --swatch--brand-200: color-mix(in srgb,var(--swatch--brand-500), white 60%);

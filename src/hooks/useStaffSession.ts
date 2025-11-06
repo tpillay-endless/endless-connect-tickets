@@ -1,8 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
-
-type StaffRole = 'admin' | 'staff';
+import type { StaffRole } from '@/lib/staff/permissions';
 
 export type StaffSessionUser = {
   name: string;
@@ -15,6 +14,11 @@ type UseStaffSessionOptions = {
    * Auto-fetch the current session on mount. Defaults to true.
    */
   autoRefresh?: boolean;
+  /**
+   * Allow any of these roles to remain authenticated. When omitted, any role is accepted.
+   * When provided together with `requiredRole`, the combined list is used.
+   */
+  allowedRoles?: readonly StaffRole[];
   /**
    * Restrict the session to a specific role. When provided, non-matching roles
    * will be treated as unauthenticated with an authorization error.
@@ -50,24 +54,42 @@ type StaffLoginResponse = {
   };
 };
 
+function normalizeAllowedRoles(
+  requiredRole?: StaffRole,
+  allowedRoles?: readonly StaffRole[]
+): StaffRole[] | undefined {
+  if (allowedRoles && allowedRoles.length) {
+    const unique = Array.from(new Set(allowedRoles));
+    if (requiredRole && !unique.includes(requiredRole)) {
+      unique.push(requiredRole);
+    }
+    return unique;
+  }
+  return requiredRole ? [requiredRole] : undefined;
+}
+
 function handleRoleGate(
   session: StaffSessionUser | null,
-  requiredRole?: StaffRole
+  allowedRoles?: readonly StaffRole[]
 ): { session: StaffSessionUser | null; error?: string } {
   if (!session) return { session: null, error: 'No active session' };
-  if (requiredRole && session.role !== requiredRole) {
+  if (allowedRoles?.length && !allowedRoles.includes(session.role)) {
     return { session: null, error: 'Unauthorized' };
   }
   return { session, error: undefined };
 }
 
 export function useStaffSession(options: UseStaffSessionOptions = {}) {
-  const { autoRefresh = true, requiredRole } = options;
+  const { autoRefresh = true, requiredRole, allowedRoles: allowedRolesOption } = options;
+  const allowedRoles = useMemo(
+    () => normalizeAllowedRoles(requiredRole, allowedRolesOption),
+    [requiredRole, allowedRolesOption]
+  );
   const [state, setState] = useState<State>({ ...DEFAULT_STATE, loading: autoRefresh });
 
   const refresh = useCallback(async () => {
     setState((prev) => ({ ...prev, loading: true, error: undefined }));
-   try {
+    try {
       const r = await fetch('/tickets/api/staff/me', { cache: 'no-store' });
       const data = (await r.json().catch(() => null)) as StaffMeResponse | null;
       if (!r.ok || !data?.ok || !data.user) {
@@ -84,14 +106,14 @@ export function useStaffSession(options: UseStaffSessionOptions = {}) {
           role: data.user.role,
           createdAt: data.user.createdAt,
         },
-        requiredRole
+        allowedRoles
       );
       setState({ loading: false, session, error });
     } catch (err) {
       console.error('[useStaffSession] refresh failed', err);
       setState({ loading: false, session: null, error: 'Auth check failed' });
     }
-  }, [requiredRole]);
+  }, [allowedRoles]);
 
   useEffect(() => {
     if (autoRefresh) {
@@ -120,7 +142,7 @@ export function useStaffSession(options: UseStaffSessionOptions = {}) {
         }
         const { session, error } = handleRoleGate(
           { name: data.user.name, role: data.user.role },
-          requiredRole
+          allowedRoles
         );
         setState({ loading: false, session, error });
         return { ok: !error && !!session, user: session, error };
@@ -130,7 +152,7 @@ export function useStaffSession(options: UseStaffSessionOptions = {}) {
         return { ok: false, user: null, error: 'Login failed' };
       }
     },
-    [requiredRole]
+    [allowedRoles]
   );
 
   const logout = useCallback(async () => {
