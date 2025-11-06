@@ -4,6 +4,7 @@ import { deleteTickets, getTicket, listTickets, putTicket } from '@/lib/ticketsD
 import { readSessionFromCookie } from '@/lib/staff';
 import { roleHasPermission } from '@/lib/staff/permissions';
 import { getStore, setStore } from '@/lib/ticketStore';
+import { resolveRequestOrigin } from '@/lib/origin';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -49,7 +50,7 @@ export async function PATCH(req: Request, context: RouteContext) {
     return NextResponse.json({ ok: false, error: 'Ticket not found' }, { status: 404 });
   }
 
-  const { origin } = new URL(req.url);
+  const origin = resolveRequestOrigin(req);
   const qr = buildAllQR({
     origin,
     name,

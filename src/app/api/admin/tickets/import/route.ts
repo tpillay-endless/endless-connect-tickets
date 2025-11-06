@@ -1,6 +1,7 @@
 import Papa from 'papaparse';
 import { NextResponse } from 'next/server';
 import { buildAllQR } from '@/lib/qr';
+import { resolveRequestOrigin } from '@/lib/origin';
 import { addTicketToIndex, putTicket, type TicketRecord } from '@/lib/ticketsDb';
 import { readSessionFromCookie } from '@/lib/staff';
 import { roleHasPermission } from '@/lib/staff/permissions';
@@ -71,7 +72,7 @@ export async function POST(req: Request) {
     );
   }
 
-  const { origin } = new URL(req.url);
+  const origin = resolveRequestOrigin(req);
   const inserted: TicketRecord[] = [];
   const errors: Array<{ row: number; error: string }> = [];
 

@@ -90,7 +90,7 @@ async function main() {
   }
 
   const EVENT_CODE = process.env.EVENT_CODE || 'single';
-  const ORIGIN = 'https://connect.endlessbiotech.com';
+  const ORIGIN = (process.env.TICKETS_BASE_URL || process.env.NEXT_PUBLIC_TICKETS_BASE_URL || 'https://connect.endlessbiotech.com').replace(/\/$/, '');
 
   const csvText = await fs.readFile(CSV_PATH, 'utf8');
   const rows = parseCSV(csvText);

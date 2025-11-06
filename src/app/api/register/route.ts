@@ -1,6 +1,7 @@
 import { getStore, setStore } from '@/lib/ticketStore';
 import { putTicket, type TicketRecord, addTicketToIndex } from '@/lib/ticketsDb';
 import { buildAllQR } from '@/lib/qr';
+import { resolveRequestOrigin } from '@/lib/origin';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -13,7 +14,7 @@ export async function POST(req: Request) {
     return Response.json({ ok:false, error:'Missing name, email, or phone' }, { status: 400 });
   }
 
-  const { origin } = new URL(req.url);
+  const origin = resolveRequestOrigin(req);
   const { token, ticketUrl, ticketPngUrl, vcardSvgUrl } = buildAllQR({
     origin, name, email, phone, company, event: 'single'
   });
