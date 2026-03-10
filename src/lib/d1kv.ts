@@ -13,23 +13,41 @@ function ttlToExpiresAt(ttlSeconds?: number): number | null {
 async function ensureSchema(db: D1Database) {
   let promise = initPromises.get(db);
   if (!promise) {
-    promise = db.exec(`
-      CREATE TABLE IF NOT EXISTS ${TABLE_KV} (
-        key TEXT PRIMARY KEY,
-        value TEXT NOT NULL,
-        expires_at INTEGER
-      );
+    promise = (async () => {
+      await db
+        .prepare(
+          `CREATE TABLE IF NOT EXISTS ${TABLE_KV} (
+            key TEXT PRIMARY KEY,
+            value TEXT NOT NULL,
+            expires_at INTEGER
+          )`
+        )
+        .run();
 
-      CREATE INDEX IF NOT EXISTS idx_${TABLE_KV}_expires_at ON ${TABLE_KV}(expires_at);
+      await db
+        .prepare(
+          `CREATE INDEX IF NOT EXISTS idx_${TABLE_KV}_expires_at
+           ON ${TABLE_KV}(expires_at)`
+        )
+        .run();
 
-      CREATE TABLE IF NOT EXISTS ${TABLE_SETS} (
-        set_key TEXT NOT NULL,
-        member TEXT NOT NULL,
-        PRIMARY KEY (set_key, member)
-      );
+      await db
+        .prepare(
+          `CREATE TABLE IF NOT EXISTS ${TABLE_SETS} (
+            set_key TEXT NOT NULL,
+            member TEXT NOT NULL,
+            PRIMARY KEY (set_key, member)
+          )`
+        )
+        .run();
 
-      CREATE INDEX IF NOT EXISTS idx_${TABLE_SETS}_set_key ON ${TABLE_SETS}(set_key);
-    `).then(() => undefined);
+      await db
+        .prepare(
+          `CREATE INDEX IF NOT EXISTS idx_${TABLE_SETS}_set_key
+           ON ${TABLE_SETS}(set_key)`
+        )
+        .run();
+    })();
     initPromises.set(db, promise);
   }
   await promise;
@@ -133,4 +151,3 @@ export async function setMembers(setKey: string): Promise<string[]> {
     .all<{ member: string }>();
   return rows.results.map((row) => row.member);
 }
-
