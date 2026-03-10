@@ -2,8 +2,8 @@
 
 ## 1. QR & Ticket System
 - Build our **own SVG QR generator** (custom line thickness, icon embedding, and color control).
-- Add **vector-safe export options** (print-ready SVG + fallback PNG).
-- Centralize all QR logic in `/lib/qr.ts` – already done, expand with optional style presets.
+- Add **vector-safe export options** (print-ready SVG + fallback PNG) (done ✅).
+- Centralize all QR logic in `/lib/qr.ts` – already done, expand with optional style presets (done ✅).
 - Add **server-side image caching** to speed up QR creation.
 - Generate **lanyard PDFs automatically** with embedded QR + name layout.
 - Explore direct **integration with Figma or Figma Tokens** for automating lanyard templates.
@@ -21,7 +21,7 @@
 
 ## 4. Staff & Check-In
 - Secure staff sessions with **login tokens instead of URLs**.
-- Add **staff roles**: `admin`, `entry`, `support`.
+- Add **staff roles**: `superadmin`, `admin`, `host`, `staff` (done ✅).
 - Live **check-in sync via WebSocket or Redis pub/sub**.
 - Add a **spinner** or mini loading state before session validation (already planned).
 
@@ -35,7 +35,14 @@
 - Build a **visual dashboard** for total / sold / checked-in in real time.
 - Add **email notifications** (via Brevo) for registration confirmation.
 - Integration with **Webflow CMS** or **Endless Cloud** to sync events automatically.
-- **Endless Connect App**: internal web app for staff check-in, QR scanning, exports.
+- **Endless Connect App**: internal web app for staff check-in, QR scanning, exports (done ✅).
+- Use **SendGrid's Email Address Validation API** to improve deliverability.
+    - Build our own instead of paying SendGrid $90/month
+- **Automatically check-in people** if manual registration is on the day of the event.
+- **Proper phone number field** in the registration form:
+    - US preselected (US & Canada at the top of th list)
+    - Country search option
+    - Number normalization before submitting
 
 ## 7. Contact Info Sharing
 - Once someone scans a vCard QR they can **save the contact and share their info** with it automatically

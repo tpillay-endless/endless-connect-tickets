@@ -1,39 +1,7 @@
 // src/lib/staff.ts
 import { randomUUID } from 'crypto';
 import type { StaffRole } from '@/lib/staff/permissions';
-
-/** ---------- KV (Upstash) tiny helpers ---------- */
-const KV = {
-  url: process.env.UPSTASH_REDIS_REST_URL,
-  token: process.env.UPSTASH_REDIS_REST_TOKEN,
-};
-async function kvSetJSON(key: string, val: unknown, ttlSeconds?: number) {
-  if (!KV.url || !KV.token) return;
-  const base = `${KV.url}/set/${encodeURIComponent(key)}`;
-  const url = ttlSeconds ? `${base}?EX=${ttlSeconds}` : base;
-  await fetch(url, {
-    method: 'POST',
-    headers: { Authorization: `Bearer ${KV.token}`, 'Content-Type': 'text/plain' },
-    body: JSON.stringify(val),
-  });
-}
-async function kvGetJSON<T = unknown>(key: string): Promise<T | null> {
-  if (!KV.url || !KV.token) return null;
-  const r = await fetch(`${KV.url}/get/${encodeURIComponent(key)}`, {
-    headers: { Authorization: `Bearer ${KV.token}` },
-    cache: 'no-store',
-  });
-  if (!r.ok) return null;
-  const j = (await r.json()) as { result: string | null };
-  if (!j.result) return null;
-  try { return JSON.parse(j.result) as T; } catch { return null; }
-}
-async function kvDel(key: string) {
-  if (!KV.url || !KV.token) return;
-  await fetch(`${KV.url}/del/${encodeURIComponent(key)}`, {
-    headers: { Authorization: `Bearer ${KV.token}` },
-  });
-}
+import { kvDel, kvGetJSON, kvSetJSON } from '@/lib/d1kv';
 
 /** ---------- Staff types ---------- */
 export type StaffUser = {
